@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="message-container"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🧠</span>
+                <span class="brand-text">BrainJam Arena</span>
+            </div>
+            
+            <div class="nav-user">
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Loading...</span>
+                    <span class="user-rank" id="user-rank">Recruit</span>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-header">
+                    <h1>Welcome back, <span id="welcome-name">Soldier</span>!</h1>
+                    <p>Ready to conquer new coding challenges?</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-content">
+                            <h3>15</h3>
+                            <p>Challenges Completed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-content">
+                            <h3>1,247</h3>
+                            <p>Total Points</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <h3>87%</h3>
+                            <p>Success Rate</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <h3>#342</h3>
+                            <p>Global Rank</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="actions-grid">
+                    <div class="action-card">
+                        <div class="action-icon">⚔️</div>
+                        <h3>Start Challenge</h3>
+                        <p>Take on a new coding challenge</p>
+                        <button class="action-btn primary">Start Now</button>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-icon">🏟️</div>
+                        <h3>Join Arena</h3>
+                        <p>Compete with other developers</p>
+                        <button class="action-btn secondary">Enter Arena</button>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-icon">📊</div>
+                        <h3>View Progress</h3>
+                        <p>Track your learning journey</p>
+                        <button class="action-btn tertiary">View Stats</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon success">✅</div>
+                        <div class="activity-content">
+                            <h4>Array Manipulation Challenge</h4>
+                            <p>Completed in 12 minutes • +150 points</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon warning">⚡</div>
+                        <div class="activity-content">
+                            <h4>Speed Challenge Arena</h4>
+                            <p>Ranked #23 out of 156 participants</p>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon info">🏆</div>
+                        <div class="activity-content">
+                            <h4>Rank Promotion</h4>
+                            <p>Advanced to Private First Class</p>
+                            <span class="activity-time">3 days ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon success">✅</div>
+                        <div class="activity-content">
+                            <h4>Algorithm Optimization</h4>
+                            <p>Completed with 95% efficiency • +200 points</p>
+                            <span class="activity-time">1 week ago</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Preview -->
+            <section class="leaderboard-preview">
+                <h2>Global Leaderboard</h2>
+                <div class="leaderboard-list">
+                    <div class="leaderboard-item rank-1">
+                        <span class="rank">#1</span>
+                        <span class="name">CodeMaster_2025</span>
+                        <span class="points">15,847 pts</span>
+                    </div>
+                    
+                    <div class="leaderboard-item rank-2">
+                        <span class="rank">#2</span>
+                        <span class="name">AlgoNinja</span>
+                        <span class="points">14,923 pts</span>
+                    </div>
+                    
+                    <div class="leaderboard-item rank-3">
+                        <span class="rank">#3</span>
+                        <span class="name">DevWarrior</span>
+                        <span class="points">13,756 pts</span>
+                    </div>
+                    
+                    <div class="leaderboard-item">
+                        <span class="rank">#342</span>
+                        <span class="name current-user" id="leaderboard-name">You</span>
+                        <span class="points">1,247 pts</span>
+                    </div>
+                </div>
+                
+                <button class="view-full-btn">View Full Leaderboard</button>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

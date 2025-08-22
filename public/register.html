@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container" style="grid-template-columns: 1fr; max-width: 500px;">
+        <!-- Register Section -->
+        <div class="auth-section">
+            <div class="auth-form">
+                <h1 class="auth-title">Register</h1>
+                <p class="auth-subtitle">New users, create an account to get started</p>
+                
+                <div id="message-container"></div>
+                
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="Choose a username"
+                            required
+                        >
+                        <span class="error-message" id="username-error"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="Enter your email"
+                            required
+                        >
+                        <span class="error-message" id="email-error"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Create a password"
+                            required
+                        >
+                        <span class="error-message" id="password-error"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="Confirm your password"
+                            required
+                        >
+                        <span class="error-message" id="confirmPassword-error"></span>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="terms" name="terms" class="form-checkbox" required>
+                        <label for="terms" class="checkbox-label">I agree to the Terms of Service</label>
+                    </div>
+                    
+                    <button type="submit" class="auth-button" id="register-btn">
+                        <span id="register-btn-text">Register</span>
+                    </button>
+                </form>
+                
+                <div class="auth-switch">
+                    Already have an account? <a href="/login.html">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/register.js"></script>
+</body>
+</html>

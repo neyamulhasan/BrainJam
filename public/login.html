@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container" style="grid-template-columns: 1fr; max-width: 500px;">
+        <!-- Login Section -->
+        <div class="auth-section">
+            <div class="auth-form">
+                <h1 class="auth-title">Login</h1>
+                <p class="auth-subtitle">Existing users, log in to your account</p>
+                
+                <div id="message-container"></div>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="identifier" class="form-label">Username or Email</label>
+                        <input 
+                            type="text" 
+                            id="identifier" 
+                            name="identifier" 
+                            class="form-input" 
+                            placeholder="Enter your username or email"
+                            required
+                        >
+                        <span class="error-message" id="identifier-error"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <span class="error-message" id="password-error"></span>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="remember" name="remember" class="form-checkbox">
+                        <label for="remember" class="checkbox-label">Remember me</label>
+                    </div>
+                    
+                    <div class="forgot-password">
+                        <a href="#forgot">Forgot Password?</a>
+                    </div>
+                    
+                    <button type="submit" class="auth-button" id="login-btn">
+                        <span id="login-btn-text">Login</span>
+                    </button>
+                </form>
+                
+                <div class="auth-switch">
+                    Don't have an account? <a href="/register.html">Sign up here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>
