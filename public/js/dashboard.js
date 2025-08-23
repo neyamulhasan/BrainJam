@@ -243,12 +243,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Achievement icons mapping
         const achievementIcons = {
-            'first_solve': '🎯',
-            'speed_demon': '⚡',
-            'multi_lang': '🌐',
-            'contest_warrior': '⚔️',
-            'problem_crusher': '💪',
-            'default': '🏆'
+            'first_solve': '<i class="fas fa-bullseye"></i>',
+            'speed_demon': '<i class="fas fa-bolt"></i>',
+            'multi_lang': '<i class="fas fa-globe"></i>',
+            'contest_warrior': '<i class="fas fa-sword"></i>',
+            'problem_crusher': '<i class="fas fa-fist-raised"></i>',
+            'default': '<i class="fas fa-trophy"></i>'
         };
 
         grid.innerHTML = achievements.map(achievement => `
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 activityHtml += `
                     <div class="activity-item">
                         <div class="activity-header">
-                            <div class="activity-title">🏆 Earned ${badge.name}</div>
+                            <div class="activity-title"><i class="fas fa-trophy"></i> Earned ${badge.name}</div>
                             <div class="activity-time">${timeAgo}</div>
                         </div>
                         <div class="activity-details">${badge.description}</div>
@@ -333,12 +333,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Load leaderboard
-    async function loadLeaderboard() {
+    // Load global leaderboard
+    async function loadGlobalLeaderboard() {
         const leaderboard = await apiCall('leaderboard');
         if (!leaderboard) return;
 
-        const list = document.getElementById('leaderboard-list');
+        const list = document.getElementById('global-leaderboard-list');
         if (!list) return;
 
         let leaderboardHtml = '';
@@ -406,6 +406,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         list.innerHTML = leaderboardHtml || '<div class="leaderboard-placeholder">No leaderboard data available</div>';
+    }
+
+    // Load starred users leaderboard
+    async function loadStarredLeaderboard() {
+        const starredData = await apiCall('leaderboard/starred');
+        if (!starredData) return;
+
+        const list = document.getElementById('starred-leaderboard-list');
+        const starredCount = document.getElementById('starred-count');
+        
+        if (!list) return;
+
+        // Update starred count
+        if (starredCount) {
+            const count = starredData.totalStarred;
+            starredCount.textContent = `${count} starred user${count !== 1 ? 's' : ''}`;
+        }
+
+        let leaderboardHtml = '';
+
+        if (starredData.starred && starredData.starred.length > 0) {
+            starredData.starred.forEach(user => {
+                const isCurrentUser = user.isCurrentUser;
+                leaderboardHtml += `
+                    <div class="leaderboard-item ${isCurrentUser ? 'current-user' : 'starred-user'}">
+                        <div class="leaderboard-rank">#${user.position}</div>
+                        <img src="${user.avatar}" alt="${user.username}" class="leaderboard-avatar">
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">
+                                ${user.username} 
+                                ${isCurrentUser ? '(You)' : ''}
+                            </div>
+                            <div class="leaderboard-rank-label">${user.rank}</div>
+                            <div class="user-badges">
+                                ${isCurrentUser ? '<span class="user-badge current-user-badge">You</span>' : '<span class="user-badge starred-badge">Starred</span>'}
+                            </div>
+                        </div>
+                        <div class="leaderboard-rating">${user.rating}</div>
+                    </div>
+                `;
+            });
+        } else {
+            leaderboardHtml = `
+                <div class="leaderboard-placeholder">
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-star" style="font-size: 48px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                        <p style="color: var(--text-muted); margin-bottom: 15px;">No starred users yet</p>
+                        <button class="btn-primary" onclick="document.getElementById('add-starred-btn').click()">
+                            <i class="fas fa-star"></i> Star Your First User
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        list.innerHTML = leaderboardHtml;
+    }
+
+    // Legacy function for compatibility
+    async function loadLeaderboard() {
+        await loadGlobalLeaderboard();
+        await loadStarredLeaderboard();
     }
 
     // Helper function to calculate time ago
@@ -540,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
 
                 if (response.ok) {
-                    showMessage('Profile updated successfully! 🎉', 'success');
+                    showMessage('Profile updated successfully!', 'success');
                     editProfileModal.style.display = 'none';
                     
                     // Refresh profile data
@@ -580,9 +642,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMessage(message, promoted ? 'success' : 'info');
                     
                     // Show detailed info in console for debugging
-                    console.log(`🎯 ${username} solved a problem!`);
-                    console.log(`📊 Rating: ${oldRating} → ${newRating} (+${ratingIncrease})`);
-                    console.log(`🏆 Rank: ${oldRank} → ${newRank}`);
+                    console.log(`Problem solved by ${username}!`);
+                    console.log(`Rating: ${oldRating} → ${newRating} (+${ratingIncrease})`);
+                    console.log(`Rank: ${oldRank} → ${newRank}`);
                     
                     // Refresh profile data to show updated rating and rank
                     await loadProfile();
@@ -592,6 +654,202 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error solving problem:', error);
                 showMessage('Failed to solve problem', 'error');
+            }
+        });
+    }
+
+    // Leaderboard tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            
+            // Update active tab button
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update active tab content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabName}-tab`) {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Load appropriate data
+            if (tabName === 'starred') {
+                loadStarredLeaderboard();
+            } else {
+                loadGlobalLeaderboard();
+            }
+        });
+    });
+
+    // Star User Modal functionality
+    const addStarredBtn = document.getElementById('add-starred-btn');
+    const addStarredModal = document.getElementById('add-starred-modal');
+    const closeStarredModal = document.getElementById('close-starred-modal');
+    const starredSearch = document.getElementById('starred-search');
+    const searchUsersBtn = document.getElementById('search-users-btn');
+    const searchResults = document.getElementById('search-results');
+
+    // Open star user modal
+    if (addStarredBtn) {
+        addStarredBtn.addEventListener('click', () => {
+            addStarredModal.style.display = 'block';
+            starredSearch.value = '';
+            searchResults.innerHTML = '<div class="search-placeholder">Enter a username to search</div>';
+        });
+    }
+
+    // Close modal handlers
+    if (closeStarredModal) {
+        closeStarredModal.addEventListener('click', () => {
+            addStarredModal.style.display = 'none';
+        });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target === addStarredModal) {
+            addStarredModal.style.display = 'none';
+        }
+    });
+
+    // Search users functionality
+    async function searchUsers(query) {
+        try {
+            const response = await fetch(`/api/dashboard/users/search?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                    'X-User-ID': JSON.parse(localStorage.getItem('user')).id?.toString() || '1'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                displaySearchResults(result.users);
+            } else {
+                showMessage(result.error || 'Failed to search users', 'error');
+            }
+        } catch (error) {
+            console.error('Error searching users:', error);
+            showMessage('Failed to search users', 'error');
+        }
+    }
+
+    // Display search results
+    function displaySearchResults(users) {
+        if (users.length === 0) {
+            searchResults.innerHTML = '<div class="search-placeholder">No users found</div>';
+            return;
+        }
+
+        const resultsHtml = users.map(user => `
+            <div class="search-result-item">
+                <div class="search-user-info">
+                    <img src="${user.avatar}" alt="${user.username}" class="search-user-avatar">
+                    <div class="search-user-details">
+                        <div class="search-user-name">${user.username}</div>
+                        <div class="search-user-rating">${user.rating} • ${user.rank}</div>
+                    </div>
+                </div>
+                <button class="starred-action-btn ${user.isStarred ? 'starred-remove-btn' : 'starred-add-btn'}" 
+                        data-user-id="${user.id}" 
+                        data-action="${user.isStarred ? 'remove' : 'add'}">
+                    ${user.isStarred ? 'Unstar' : 'Star User'}
+                </button>
+            </div>
+        `).join('');
+
+        searchResults.innerHTML = resultsHtml;
+
+        // Add event listeners to starred action buttons
+        searchResults.querySelectorAll('.starred-action-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const userId = btn.dataset.userId;
+                const action = btn.dataset.action;
+                await handleStarredAction(userId, action, btn);
+            });
+        });
+    }
+
+    // Handle starred add/remove
+    async function handleStarredAction(userId, action, button) {
+        try {
+            const response = await fetch(`/api/dashboard/starred/${action}/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                    'X-User-ID': JSON.parse(localStorage.getItem('user')).id?.toString() || '1'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showMessage(result.message, 'success');
+                
+                // Update button state
+                if (action === 'add') {
+                    button.textContent = 'Unstar';
+                    button.className = 'starred-action-btn starred-remove-btn';
+                    button.dataset.action = 'remove';
+                } else {
+                    button.textContent = 'Star User';
+                    button.className = 'starred-action-btn starred-add-btn';
+                    button.dataset.action = 'add';
+                }
+
+                // Refresh starred leaderboard if on starred tab
+                const starredTab = document.getElementById('starred-tab');
+                if (starredTab && starredTab.classList.contains('active')) {
+                    await loadStarredLeaderboard();
+                }
+            } else {
+                showMessage(result.error || 'Failed to update starred status', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating starred status:', error);
+            showMessage('Failed to update starred status', 'error');
+        }
+    }
+
+    // Search on button click
+    if (searchUsersBtn) {
+        searchUsersBtn.addEventListener('click', () => {
+            const query = starredSearch.value.trim();
+            if (query.length >= 2) {
+                searchUsers(query);
+            } else {
+                showMessage('Please enter at least 2 characters to search', 'info');
+            }
+        });
+    }
+
+    // Search on Enter key
+    if (starredSearch) {
+        starredSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchUsersBtn.click();
+            }
+        });
+
+        // Auto-search as user types (with debounce)
+        let searchTimeout;
+        starredSearch.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            const query = starredSearch.value.trim();
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    searchUsers(query);
+                }, 500);
+            } else if (query.length === 0) {
+                searchResults.innerHTML = '<div class="search-placeholder">Enter a username to search</div>';
             }
         });
     }
@@ -613,7 +871,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadLeaderboard()
             ]);
             
-            showMessage('Dashboard loaded successfully! 🎯', 'success');
+            showMessage('Dashboard loaded successfully!', 'success');
         } catch (error) {
             console.error('Dashboard initialization error:', error);
             showMessage('Failed to load dashboard data', 'error');

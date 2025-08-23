@@ -464,6 +464,172 @@ router.get('/leaderboard', requireAuth, async (req, res) => {
     }
 });
 
+// Get starred users leaderboard
+router.get('/leaderboard/starred', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Get starred users leaderboard including the current user
+        const [starredLeaderboard] = await db.execute(`
+            SELECT 
+                u.id,
+                u.username,
+                u.rating,
+                u.rank_label,
+                u.avatar_url,
+                DENSE_RANK() OVER (ORDER BY u.rating DESC) as position,
+                ROW_NUMBER() OVER (ORDER BY u.rating DESC, u.created_at ASC) as display_order,
+                CASE WHEN u.id = ? THEN 1 ELSE 0 END as is_current_user
+            FROM users u
+            WHERE u.id = ? 
+               OR u.id IN (
+                   SELECT f.friend_id FROM friends f WHERE f.user_id = ?
+                   UNION
+                   SELECT f.user_id FROM friends f WHERE f.friend_id = ?
+               )
+            ORDER BY u.rating DESC, u.created_at ASC
+        `, [userId, userId, userId, userId]);
+        
+        // Get starred users count
+        const [starredCount] = await db.execute(`
+            SELECT COUNT(*) as total_starred
+            FROM (
+                SELECT f.friend_id as starred FROM friends f WHERE f.user_id = ?
+                UNION
+                SELECT f.user_id as starred FROM friends f WHERE f.friend_id = ?
+            ) as all_starred
+        `, [userId, userId]);
+
+        res.json({
+            starred: starredLeaderboard.map(user => ({
+                id: user.id,
+                username: user.username,
+                rating: user.rating,
+                rank: user.rank_label,
+                avatar: user.avatar_url || '/images/default-avatar.svg',
+                position: user.position,
+                displayOrder: user.display_order,
+                isCurrentUser: user.is_current_user === 1
+            })),
+            totalStarred: starredCount[0].total_starred,
+            currentUserIncluded: starredLeaderboard.some(user => user.id === userId)
+        });
+    } catch (error) {
+        console.error('Starred users leaderboard fetch error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Add/Remove starred user
+router.post('/starred/:action/:targetUserId', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { action, targetUserId } = req.params;
+        const targetId = parseInt(targetUserId);
+
+        if (userId === targetId) {
+            return res.status(400).json({ error: 'Cannot star yourself' });
+        }
+
+        // Check if target user exists
+        const [targetUser] = await db.execute('SELECT id, username FROM users WHERE id = ?', [targetId]);
+        if (targetUser.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (action === 'add') {
+            // Check if already starred
+            const [existingStarred] = await db.execute(
+                'SELECT 1 FROM friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
+                [userId, targetId, targetId, userId]
+            );
+
+            if (existingStarred.length > 0) {
+                return res.status(400).json({ error: 'User already starred' });
+            }
+
+            // Add starred user (bidirectional)
+            await db.execute('INSERT INTO friends (user_id, friend_id) VALUES (?, ?)', [userId, targetId]);
+            
+            res.json({ 
+                success: true, 
+                message: `Starred ${targetUser[0].username}`,
+                action: 'starred'
+            });
+
+        } else if (action === 'remove') {
+            // Remove starred user (bidirectional)
+            await db.execute(
+                'DELETE FROM friends WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
+                [userId, targetId, targetId, userId]
+            );
+            
+            res.json({ 
+                success: true, 
+                message: `Unstarred ${targetUser[0].username}`,
+                action: 'unstarred'
+            });
+        } else {
+            return res.status(400).json({ error: 'Invalid action. Use add or remove' });
+        }
+
+    } catch (error) {
+        console.error('Starred user action error:', error);
+        res.status(500).json({ error: 'Failed to update starred user status' });
+    }
+});
+
+// Search users for starring
+router.get('/users/search', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { q } = req.query;
+
+        if (!q || q.length < 2) {
+            return res.status(400).json({ error: 'Search query must be at least 2 characters' });
+        }
+
+        // Search users by username, excluding current user and existing starred users
+        const [users] = await db.execute(`
+            SELECT 
+                u.id,
+                u.username,
+                u.rating,
+                u.rank_label,
+                u.avatar_url,
+                CASE WHEN f.user_id IS NOT NULL THEN 1 ELSE 0 END as is_starred
+            FROM users u
+            LEFT JOIN (
+                SELECT friend_id as user_id FROM friends WHERE user_id = ?
+                UNION
+                SELECT user_id FROM friends WHERE friend_id = ?
+            ) f ON u.id = f.user_id
+            WHERE u.username LIKE ? AND u.id != ?
+            ORDER BY 
+                is_starred ASC,
+                u.rating DESC,
+                u.username ASC
+            LIMIT 20
+        `, [userId, userId, `%${q}%`, userId]);
+
+        res.json({
+            users: users.map(user => ({
+                id: user.id,
+                username: user.username,
+                rating: user.rating,
+                rank: user.rank_label,
+                avatar: user.avatar_url || '/images/default-avatar.svg',
+                isStarred: user.is_starred === 1
+            })),
+            query: q
+        });
+
+    } catch (error) {
+        console.error('User search error:', error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
+
 // Update user profile
 router.put('/profile', requireAuth, async (req, res) => {
     try {
@@ -600,8 +766,8 @@ router.post('/simulate-solve', requireAuth, async (req, res) => {
             newRank,
             promoted,
             message: promoted 
-                ? `🎉 Congratulations! You've been promoted from ${oldRank} to ${newRank}!`
-                : `✅ Rating increased! You're still a ${newRank}.`
+                ? `Congratulations! You've been promoted from ${oldRank} to ${newRank}!`
+                : `Rating increased! You're still a ${newRank}.`
         });
 
     } catch (error) {

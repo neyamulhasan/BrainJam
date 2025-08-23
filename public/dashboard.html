@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -17,8 +18,8 @@
     <nav class="nav-bar">
         <div class="nav-container">
             <div class="nav-brand">
-                <span class="brand-icon">🧠</span>
-                <span class="brand-text">BrainJam Arena</span>
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
             </div>
             
             <div class="nav-links">
@@ -32,10 +33,10 @@
             <div class="nav-user">
                 <div class="search-box">
                     <input type="text" placeholder="Search">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
                 </div>
                 <button class="logout-btn" id="logout-btn">
-                    <span>🚪</span> Logout
+                    <span><i class="fas fa-sign-out-alt"></i></span> Logout
                 </button>
             </div>
         </div>
@@ -59,7 +60,7 @@
                         <p class="profile-rating">Rating: <span id="profile-rating">1850</span></p>
                         <p class="profile-global-rank">Global Rank: #<span id="global-rank">342</span></p>
                         <button class="edit-profile-btn" id="edit-profile-btn">Edit Profile</button>
-                        <button class="test-solve-btn" id="test-solve-btn">🎯 Solve Problem (Test)</button>
+                        <button class="test-solve-btn" id="test-solve-btn"><i class="fas fa-code"></i> Solve Problem (Test)</button>
                     </div>
                 </div>
                 
@@ -186,11 +187,65 @@
 
             <!-- Leaderboard -->
             <section class="leaderboard">
-                <h2>Global Leaderboard</h2>
-                <div class="leaderboard-list" id="leaderboard-list">
-                    <div class="leaderboard-placeholder">Loading leaderboard...</div>
+                <div class="leaderboard-header">
+                    <h2>Leaderboard</h2>
+                    <div class="leaderboard-tabs">
+                        <button class="tab-btn active" data-tab="global">Global</button>
+                        <button class="tab-btn" data-tab="starred">Starred</button>
+                    </div>
+                </div>
+                
+                <!-- Global Leaderboard -->
+                <div class="tab-content active" id="global-tab">
+                    <div class="leaderboard-controls">
+                        <span class="leaderboard-info">Top players worldwide</span>
+                    </div>
+                    <div class="leaderboard-list" id="global-leaderboard-list">
+                        <div class="leaderboard-placeholder">Loading global leaderboard...</div>
+                    </div>
+                </div>
+                
+                <!-- Starred Users Leaderboard -->
+                <div class="tab-content" id="starred-tab">
+                    <div class="leaderboard-controls">
+                        <div class="starred-actions">
+                            <button class="btn-primary" id="add-starred-btn">
+                                <i class="fas fa-star"></i> Star User
+                            </button>
+                            <span class="starred-count" id="starred-count">0 starred users</span>
+                        </div>
+                    </div>
+                    <div class="leaderboard-list" id="starred-leaderboard-list">
+                        <div class="leaderboard-placeholder">Loading starred users...</div>
+                    </div>
                 </div>
             </section>
+
+            <!-- Star User Modal -->
+            <div id="add-starred-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Star User</h3>
+                        <span class="close" id="close-starred-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="search-section">
+                            <div class="form-group">
+                                <label for="starred-search">Search Users:</label>
+                                <div class="search-input-container">
+                                    <input type="text" id="starred-search" placeholder="Enter username...">
+                                    <button type="button" id="search-users-btn" class="search-btn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="search-results" id="search-results">
+                                <div class="search-placeholder">Enter a username to search</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
