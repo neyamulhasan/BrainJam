@@ -2,6 +2,48 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 
+// Utility function to determine rank based on rating
+function getRankFromRating(rating) {
+    if (rating >= 2200) return 'Legendary General';
+    if (rating >= 1800) return 'Algorithm Captain';
+    if (rating >= 1500) return 'Tech Lieutenant';
+    if (rating >= 1200) return 'Code Corporal';
+    if (rating >= 900) return 'Cadet Coder';
+    return 'Private Recruit';
+}
+
+// Utility function to update user rank based on current rating
+async function updateUserRank(userId) {
+    try {
+        // Get current user rating
+        const [userRows] = await db.execute(
+            'SELECT rating, rank_label FROM users WHERE id = ?',
+            [userId]
+        );
+        
+        if (userRows.length === 0) return false;
+        
+        const currentRating = userRows[0].rating;
+        const currentRank = userRows[0].rank_label;
+        const newRank = getRankFromRating(currentRating);
+        
+        // Update rank if it has changed
+        if (currentRank !== newRank) {
+            await db.execute(
+                'UPDATE users SET rank_label = ? WHERE id = ?',
+                [newRank, userId]
+            );
+            console.log(`Updated user ${userId} rank from ${currentRank} to ${newRank} (rating: ${currentRating})`);
+            return { changed: true, oldRank: currentRank, newRank, rating: currentRating };
+        }
+        
+        return { changed: false, rank: currentRank, rating: currentRating };
+    } catch (error) {
+        console.error('Error updating user rank:', error);
+        return false;
+    }
+}
+
 // Middleware to check authentication
 const requireAuth = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
@@ -24,6 +66,9 @@ const requireAuth = (req, res, next) => {
 router.get('/profile', requireAuth, async (req, res) => {
     try {
         const userId = req.user.id;
+        
+        // Update user rank based on current rating
+        await updateUserRank(userId);
         
         // Get user basic info with user stats
         const [userRows] = await db.execute(`
@@ -503,6 +548,65 @@ router.get('/profile/email', requireAuth, async (req, res) => {
     } catch (error) {
         console.error('Profile email fetch error:', error);
         res.status(500).json({ error: 'Failed to fetch profile data' });
+    }
+});
+
+// DEMO: Simulate solving a problem (for testing ranking system)
+router.post('/simulate-solve', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { ratingIncrease = 50 } = req.body;
+
+        // Get current user data
+        const [userRows] = await db.execute(
+            'SELECT username, rating, rank_label FROM users WHERE id = ?',
+            [userId]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = userRows[0];
+        const oldRating = user.rating;
+        const oldRank = user.rank_label;
+        const newRating = oldRating + parseInt(ratingIncrease);
+        const newRank = getRankFromRating(newRating);
+
+        // Update user rating
+        await db.execute(
+            'UPDATE users SET rating = ? WHERE id = ?',
+            [newRating, userId]
+        );
+
+        // Update rank (this will be done automatically by updateUserRank)
+        const rankUpdate = await updateUserRank(userId);
+
+        // Add to rating history
+        await db.execute(
+            'INSERT INTO rating_history (user_id, rating_before, rating_after, delta, reason) VALUES (?, ?, ?, ?, ?)',
+            [userId, oldRating, newRating, ratingIncrease, 'problem_solve']
+        );
+
+        const promoted = oldRank !== newRank;
+
+        res.json({
+            success: true,
+            username: user.username,
+            oldRating,
+            newRating,
+            ratingIncrease: parseInt(ratingIncrease),
+            oldRank,
+            newRank,
+            promoted,
+            message: promoted 
+                ? `🎉 Congratulations! You've been promoted from ${oldRank} to ${newRank}!`
+                : `✅ Rating increased! You're still a ${newRank}.`
+        });
+
+    } catch (error) {
+        console.error('Error simulating problem solve:', error);
+        res.status(500).json({ error: 'Failed to simulate problem solve' });
     }
 });
 
