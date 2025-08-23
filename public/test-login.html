@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - BrainJam Arena</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .test-login {
+            background: #1a1a25;
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid #2a2d3a;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+        }
+        .test-user {
+            background: #242438;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #2a2d3a;
+        }
+        .btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #00ff88; color: #000; }
+        .error { background: #ff4757; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="test-login">
+        <h1>🧠 BrainJam Test Login</h1>
+        <p>Use these test credentials to access the dashboard:</p>
+        
+        <div class="test-user">
+            <h3>Test User</h3>
+            <p><strong>Username:</strong> testuser</p>
+            <p><strong>Password:</strong> password123</p>
+            <button class="btn" onclick="autoLogin()">Auto Login as Test User</button>
+        </div>
+        
+        <div class="test-user">
+            <h3>Manual Login</h3>
+            <button class="btn" onclick="window.location.href='/login.html'">Go to Login Page</button>
+        </div>
+        
+        <div class="test-user">
+            <h3>Direct Dashboard Access</h3>
+            <p>Skip login and go directly to dashboard (demo mode)</p>
+            <button class="btn" onclick="demoLogin()">Demo Dashboard</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => messageDiv.innerHTML = '', 3000);
+        }
+
+        async function autoLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identifier: 'testuser',
+                        password: 'password123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = '/dashboard', 1500);
+                } else {
+                    showMessage('Login failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showMessage('Network error: ' + error.message, 'error');
+            }
+        }
+
+        function demoLogin() {
+            // Create demo user data
+            const demoUser = {
+                id: 10,
+                username: 'testuser',
+                email: 'test@example.com',
+                rating: 1850,
+                rank_label: 'Algorithm Captain'
+            };
+            
+            localStorage.setItem('authToken', 'demo-token-' + Date.now());
+            localStorage.setItem('user', JSON.stringify(demoUser));
+            showMessage('Demo mode activated! Redirecting...', 'success');
+            setTimeout(() => window.location.href = '/dashboard', 1500);
+        }
+    </script>
+</body>
+</html>
