@@ -242,7 +242,8 @@ body {
     margin-bottom: 15px;
 }
 
-.edit-profile-btn {
+.edit-profile-btn,
+.test-solve-btn {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
@@ -251,9 +252,16 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
-.edit-profile-btn:hover {
+.test-solve-btn {
+    background: linear-gradient(135deg, var(--success-color), #00cc66);
+}
+
+.edit-profile-btn:hover,
+.test-solve-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px var(--glow-color);
 }

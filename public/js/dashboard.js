@@ -555,6 +555,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Test Solve Problem functionality (for demonstrating ranking system)
+    const testSolveBtn = document.getElementById('test-solve-btn');
+    if (testSolveBtn) {
+        testSolveBtn.addEventListener('click', async () => {
+            try {
+                const ratingIncrease = Math.floor(Math.random() * 100) + 25; // Random 25-125 points
+                
+                const response = await fetch('/api/dashboard/simulate-solve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'X-User-ID': JSON.parse(localStorage.getItem('user')).id?.toString() || '1'
+                    },
+                    body: JSON.stringify({ ratingIncrease })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const { username, oldRating, newRating, ratingIncrease, oldRank, newRank, promoted, message } = result;
+                    
+                    showMessage(message, promoted ? 'success' : 'info');
+                    
+                    // Show detailed info in console for debugging
+                    console.log(`🎯 ${username} solved a problem!`);
+                    console.log(`📊 Rating: ${oldRating} → ${newRating} (+${ratingIncrease})`);
+                    console.log(`🏆 Rank: ${oldRank} → ${newRank}`);
+                    
+                    // Refresh profile data to show updated rating and rank
+                    await loadProfile();
+                } else {
+                    showMessage(result.error || 'Failed to solve problem', 'error');
+                }
+            } catch (error) {
+                console.error('Error solving problem:', error);
+                showMessage('Failed to solve problem', 'error');
+            }
+        });
+    }
+
     // Initialize dashboard
     async function initializeDashboard() {
         const user = checkAuth();
