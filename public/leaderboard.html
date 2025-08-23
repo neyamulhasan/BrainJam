@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="css/rank-components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="message-container"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" class="nav-link">Compete</a>
+                <a href="#" class="nav-link">Practice</a>
+                <a href="#" class="nav-link">Learn</a>
+                <a href="#" class="nav-link">Discuss</a>
+                <a href="leaderboard.html" class="nav-link active">Leaderboard</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="search-box">
+                    <input type="text" placeholder="Search users..." id="user-search">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                </div>
+                <a href="dashboard.html" class="nav-link dashboard-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <button class="logout-btn" id="logout-btn">
+                    <span><i class="fas fa-sign-out-alt"></i></span> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Leaderboard Content -->
+    <main class="leaderboard-main">
+        <div class="container">
+            <!-- Leaderboard Header -->
+            <header class="leaderboard-header">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <i class="fas fa-trophy"></i>
+                        Leaderboard
+                    </h1>
+                    <p class="page-subtitle">Compete with the best coders worldwide</p>
+                </div>
+                
+                <div class="leaderboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-users">0</span>
+                            <span class="stat-label">Total Players</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="starred-users">0</span>
+                            <span class="stat-label">Starred Users</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card your-rank-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="rank-badge large" id="your-rank-badge">--</div>
+                            <span class="stat-label">Your Current Rank</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Rank Progression Chart -->
+            <section class="rank-progression-section">
+                <div class="chart-header">
+                    <h2><i class="fas fa-chart-line"></i> Your Rank Progression</h2>
+                    <div class="chart-controls">
+                        <select id="chart-period">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 3 months</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="rank-chart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat">
+                        <span class="stat-value" id="rank-change">--</span>
+                        <span class="stat-label">Rank Change</span>
+                    </div>
+                    <div class="chart-stat">
+                        <span class="stat-value" id="rating-change">--</span>
+                        <span class="stat-label">Rating Change</span>
+                    </div>
+                    <div class="chart-stat">
+                        <span class="stat-value" id="best-rank">--</span>
+                        <span class="stat-label">Best Rank</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Controls -->
+            <div class="leaderboard-controls">
+                <div class="control-tabs">
+                    <button class="control-tab active" data-tab="global">
+                        <i class="fas fa-globe"></i>
+                        Global Rankings
+                    </button>
+                    <button class="control-tab" data-tab="starred">
+                        <i class="fas fa-star"></i>
+                        Starred Users
+                    </button>
+                </div>
+                
+                <div class="control-actions">
+                    <div class="filter-dropdown">
+                        <select id="rank-filter">
+                            <option value="all">All Ranks</option>
+                            <option value="Legendary General">Legendary General</option>
+                            <option value="Algorithm Captain">Algorithm Captain</option>
+                            <option value="Tech Lieutenant">Tech Lieutenant</option>
+                            <option value="Code Corporal">Code Corporal</option>
+                            <option value="Cadet Coder">Cadet Coder</option>
+                            <option value="Private Recruit">Private Recruit</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="star-user-btn">
+                        <i class="fas fa-star"></i>
+                        Star User
+                    </button>
+                    
+                    <button class="btn btn-secondary" id="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Leaderboard Content -->
+            <div class="leaderboard-content">
+                <!-- Global Leaderboard -->
+                <div class="tab-content active" id="global-content">
+                    <div class="leaderboard-list" id="global-leaderboard">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading global leaderboard...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Starred Users Leaderboard -->
+                <div class="tab-content" id="starred-content">
+                    <div class="leaderboard-list" id="starred-leaderboard">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading starred users...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prev-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </button>
+                
+                <div class="page-info">
+                    <span>Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+                </div>
+                
+                <button class="page-btn" id="next-btn">
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Star User Modal -->
+        <div id="star-user-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-star"></i> Star User</h3>
+                    <span class="close" id="close-star-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="search-section">
+                        <div class="form-group">
+                            <label for="user-search-input">Search Users:</label>
+                            <div class="search-input-container">
+                                <input type="text" id="user-search-input" placeholder="Enter username...">
+                                <button type="button" id="search-btn" class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="search-results" id="search-results">
+                            <div class="search-placeholder">Enter a username to search</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/leaderboard.js"></script>
+</body>
+</html>

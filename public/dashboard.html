@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - BrainJam Arena</title>
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/rank-components.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="message-container"></div>
@@ -16,17 +19,26 @@
     <nav class="nav-bar">
         <div class="nav-container">
             <div class="nav-brand">
-                <span class="brand-icon">🧠</span>
-                <span class="brand-text">BrainJam Arena</span>
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" class="nav-link">Compete</a>
+                <a href="#" class="nav-link">Practice</a>
+                <a href="#" class="nav-link">Learn</a>
+                <a href="#" class="nav-link">Discuss</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+                <a href="/geek-feed" class="nav-link">Geek Feed</a>
             </div>
             
             <div class="nav-user">
-                <div class="user-info">
-                    <span class="user-name" id="user-name">Loading...</span>
-                    <span class="user-rank" id="user-rank">Recruit</span>
+                <div class="search-box">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
                 </div>
                 <button class="logout-btn" id="logout-btn">
-                    <span>🚪</span> Logout
+                    <span><i class="fas fa-sign-out-alt"></i></span> Logout
                 </button>
             </div>
         </div>
@@ -35,148 +47,219 @@
     <!-- Main Dashboard -->
     <main class="dashboard">
         <div class="dashboard-container">
-            <!-- Welcome Section -->
-            <section class="welcome-section">
-                <div class="welcome-header">
-                    <h1>Welcome back, <span id="welcome-name">Soldier</span>!</h1>
-                    <p>Ready to conquer new coding challenges?</p>
+            <!-- Profile Section -->
+            <section class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <img id="profile-avatar" src="/images/default-avatar.svg" alt="Profile Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Loading...</h2>
+                        <div class="profile-rank-display">
+                            <div class="rank-badge large" id="profile-rank-badge">--</div>
+                            <div class="profile-rank-info">
+                                <div class="profile-rank-title" id="profile-rank-label">Loading...</div>
+                                <div class="profile-rank-subtitle">Rating: <span id="profile-rating">--</span></div>
+                            </div>
+                        </div>
+                        <div class="rank-container horizontal" style="margin-top: 10px;">
+                            <div class="rank-display">
+                                <i class="fas fa-globe text-primary"></i>
+                                <span class="rank-text">Global Rank: #<span id="global-rank">--</span></span>
+                            </div>
+                        </div>
+                        <button class="edit-profile-btn" id="edit-profile-btn">Edit Profile</button>
+                        <button class="test-solve-btn" id="test-solve-btn"><i class="fas fa-code"></i> Solve Problem (Test)</button>
+                    </div>
                 </div>
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div class="stat-content">
-                            <h3>15</h3>
-                            <p>Challenges Completed</p>
+                <!-- Edit Profile Modal -->
+                <div id="edit-profile-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Edit Profile</h3>
+                            <span class="close" id="close-modal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="edit-profile-form">
+                                <div class="form-group">
+                                    <label for="profile-email">Email:</label>
+                                    <input type="email" id="profile-email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-avatar-url">Profile Picture URL:</label>
+                                    <input type="url" id="profile-avatar-url" name="avatar_url" placeholder="https://example.com/your-image.jpg">
+                                    <small>Enter a valid image URL for your profile picture</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preview:</label>
+                                    <div class="avatar-preview">
+                                        <img id="avatar-preview" src="/images/default-avatar.svg" alt="Avatar Preview">
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
+                                    <button type="submit" id="save-profile" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
-                        <div class="stat-content">
-                            <h3>1,247</h3>
-                            <p>Total Points</p>
-                        </div>
+                </div>
+                
+                <div class="rank-progress">
+                    <div class="rank-container horizontal">
+                        <span class="rank-label">Progress to Next Rank:</span>
+                        <div class="rank-badge small" id="next-rank-badge">--</div>
+                        <span class="rank-label" id="next-rank">Major</span>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-content">
-                            <h3>87%</h3>
-                            <p>Success Rate</p>
-                        </div>
+                    <div class="rank-progress-bar">
+                        <div class="rank-progress-fill" id="progress-fill"></div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">📈</div>
-                        <div class="stat-content">
-                            <h3>#342</h3>
-                            <p>Global Rank</p>
-                        </div>
+                    <div class="rank-progress-text">
+                        <span><span id="current-points">750</span> points</span>
+                        <span><span id="next-rank-points">1000</span> needed</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <h2>Quick Actions</h2>
-                <div class="actions-grid">
-                    <div class="action-card">
-                        <div class="action-icon">⚔️</div>
-                        <h3>Start Challenge</h3>
-                        <p>Take on a new coding challenge</p>
-                        <button class="action-btn primary">Start Now</button>
+            <!-- Match History -->
+            <section class="match-history">
+                <h2>Match History</h2>
+                <div class="table-container">
+                    <table class="match-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opponent</th>
+                                <th>Result</th>
+                                <th>Rating Change</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-history-body">
+                            <tr>
+                                <td colspan="4" class="loading-cell">Loading matches...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Statistics -->
+            <section class="statistics">
+                <h2>Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Problems Solved</h3>
+                        <div class="stat-value" id="problems-solved">0</div>
                     </div>
-                    
-                    <div class="action-card">
-                        <div class="action-icon">🏟️</div>
-                        <h3>Join Arena</h3>
-                        <p>Compete with other developers</p>
-                        <button class="action-btn secondary">Enter Arena</button>
+                    <div class="stat-card">
+                        <h3>Languages Used</h3>
+                        <div class="stat-value" id="languages-used">0</div>
                     </div>
-                    
-                    <div class="action-card">
-                        <div class="action-icon">📊</div>
-                        <h3>View Progress</h3>
-                        <p>Track your learning journey</p>
-                        <button class="action-btn tertiary">View Stats</button>
+                    <div class="stat-card">
+                        <h3>Average Solve Time</h3>
+                        <div class="stat-value" id="avg-solve-time">N/A</div>
                     </div>
+                    <div class="stat-card">
+                        <h3>Contest Participations</h3>
+                        <div class="stat-value" id="contest-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Contest Wins</h3>
+                        <div class="stat-value" id="win-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Current Streak</h3>
+                        <div class="stat-value" id="streak-days">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problems Solved by Language Chart -->
+            <section class="language-chart">
+                <h2>Problems Solved by Language</h2>
+                <div class="chart-container">
+                    <canvas id="languageChart"></canvas>
                 </div>
             </section>
 
             <!-- Recent Activity -->
             <section class="recent-activity">
                 <h2>Recent Activity</h2>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon success">✅</div>
-                        <div class="activity-content">
-                            <h4>Array Manipulation Challenge</h4>
-                            <p>Completed in 12 minutes • +150 points</p>
-                            <span class="activity-time">2 hours ago</span>
+                <div class="activity-list" id="activity-list">
+                    <div class="activity-placeholder">Loading recent activity...</div>
+                </div>
+            </section>
+
+            <!-- Achievements -->
+            <section class="achievements">
+                <h2>Achievements</h2>
+                <div class="achievements-grid" id="achievements-grid">
+                    <div class="achievement-placeholder">Loading achievements...</div>
+                </div>
+            </section>
+
+            <!-- Leaderboard -->
+            <section class="leaderboard">
+                <div class="leaderboard-header">
+                    <h2>Leaderboard</h2>
+                    <div class="leaderboard-tabs">
+                        <button class="tab-btn active" data-tab="global">Global</button>
+                        <button class="tab-btn" data-tab="starred">Starred</button>
+                    </div>
+                </div>
+                
+                <!-- Global Leaderboard -->
+                <div class="tab-content active" id="global-tab">
+                    <div class="leaderboard-controls">
+                        <span class="leaderboard-info">Top players worldwide</span>
+                    </div>
+                    <div class="leaderboard-list" id="global-leaderboard-list">
+                        <div class="leaderboard-placeholder">Loading global leaderboard...</div>
+                    </div>
+                </div>
+                
+                <!-- Starred Users Leaderboard -->
+                <div class="tab-content" id="starred-tab">
+                    <div class="leaderboard-controls">
+                        <div class="starred-actions">
+                            <button class="btn-primary" id="add-starred-btn">
+                                <i class="fas fa-star"></i> Star User
+                            </button>
+                            <span class="starred-count" id="starred-count">0 starred users</span>
                         </div>
                     </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon warning">⚡</div>
-                        <div class="activity-content">
-                            <h4>Speed Challenge Arena</h4>
-                            <p>Ranked #23 out of 156 participants</p>
-                            <span class="activity-time">1 day ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon info">🏆</div>
-                        <div class="activity-content">
-                            <h4>Rank Promotion</h4>
-                            <p>Advanced to Private First Class</p>
-                            <span class="activity-time">3 days ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon success">✅</div>
-                        <div class="activity-content">
-                            <h4>Algorithm Optimization</h4>
-                            <p>Completed with 95% efficiency • +200 points</p>
-                            <span class="activity-time">1 week ago</span>
-                        </div>
+                    <div class="leaderboard-list" id="starred-leaderboard-list">
+                        <div class="leaderboard-placeholder">Loading starred users...</div>
                     </div>
                 </div>
             </section>
 
-            <!-- Leaderboard Preview -->
-            <section class="leaderboard-preview">
-                <h2>Global Leaderboard</h2>
-                <div class="leaderboard-list">
-                    <div class="leaderboard-item rank-1">
-                        <span class="rank">#1</span>
-                        <span class="name">CodeMaster_2025</span>
-                        <span class="points">15,847 pts</span>
+            <!-- Star User Modal -->
+            <div id="add-starred-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Star User</h3>
+                        <span class="close" id="close-starred-modal">&times;</span>
                     </div>
-                    
-                    <div class="leaderboard-item rank-2">
-                        <span class="rank">#2</span>
-                        <span class="name">AlgoNinja</span>
-                        <span class="points">14,923 pts</span>
-                    </div>
-                    
-                    <div class="leaderboard-item rank-3">
-                        <span class="rank">#3</span>
-                        <span class="name">DevWarrior</span>
-                        <span class="points">13,756 pts</span>
-                    </div>
-                    
-                    <div class="leaderboard-item">
-                        <span class="rank">#342</span>
-                        <span class="name current-user" id="leaderboard-name">You</span>
-                        <span class="points">1,247 pts</span>
+                    <div class="modal-body">
+                        <div class="search-section">
+                            <div class="form-group">
+                                <label for="starred-search">Search Users:</label>
+                                <div class="search-input-container">
+                                    <input type="text" id="starred-search" placeholder="Enter username...">
+                                    <button type="button" id="search-users-btn" class="search-btn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="search-results" id="search-results">
+                                <div class="search-placeholder">Enter a username to search</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <button class="view-full-btn">View Full Leaderboard</button>
-            </section>
+            </div>
         </div>
     </main>
 

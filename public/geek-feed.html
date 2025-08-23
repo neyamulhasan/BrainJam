@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geek Feed - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/geek_feed.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="message-container"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
+            </div>
+
+            <div class="nav-links">
+                <a href="#" class="nav-link">Compete</a>
+                <a href="#" class="nav-link">Practice</a>
+                <a href="#" class="nav-link">Learn</a>
+                <a href="/geek-feed" class="nav-link active">Geek Feed</a>
+                <a href="#" class="nav-link">Leaderboard</a>
+            </div>
+
+            <div class="nav-user">
+                <div class="search-box">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                </div>
+                <span class="notifications">
+                    <i class="fas fa-bell"></i>
+                </span>
+                <div class="user-dropdown" id="user-dropdown">
+                    <a href="/dashboard">
+                        <img src="images/default-avatar.svg" alt="User Avatar" class="user-avatar-small"
+                            id="user-avatar-nav">
+                    </a>
+                    <span class="dropdown-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <span><i class="fas fa-sign-out-alt"></i></span> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="geek-feed-container">
+        <h1 class="geek-feed-title">Geek Feed</h1>
+
+        <!-- Write Post Form -->
+        <div class="post-form">
+            <textarea id="post-content" placeholder="Write a post..."></textarea>
+            <div class="post-submit-container">
+                <button id="submit-post" class="post-button">Post</button>
+            </div>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="feed-sort">
+            <select id="sort-select" class="sort-dropdown">
+                <option value="latest">Latest</option>
+                <option value="top">Top Voted</option>
+            </select>
+        </div>
+
+        <!-- Posts Container -->
+        <div id="posts-container">
+            <!-- Posts will be loaded here dynamically -->
+        </div>
+    </main>
+
+    <script src="js/geek_feed.js"></script>
+</body>
+
+</html>

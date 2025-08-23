@@ -4,6 +4,8 @@ const path = require('path');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
+const geekFeedRoutes = require('./routes/geek_feed');
 const db = require('./config/database');
 
 const app = express();
@@ -17,6 +19,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/geek-feed', geekFeedRoutes);
 
 // Serve HTML pages
 app.get('/', (req, res) => {
@@ -31,14 +35,12 @@ app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
-// Test database connection
-app.get('/api/test-db', async (req, res) => {
-    try {
-        await db.execute('SELECT 1 as test');
-        res.json({ success: true, message: 'Database connected successfully' });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/geek-feed', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'geek-feed.html'));
 });
 
 // Error handling middleware
