@@ -524,6 +524,19 @@ body {
     padding: 40px;
 }
 
+/* Utility Classes */
+.text-primary {
+    color: var(--primary-color);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
 /* Recent Activity */
 .recent-activity {
     grid-area: activity;
@@ -649,11 +662,11 @@ body {
     transform: translateX(5px);
 }
 
-.leaderboard-rank {
-    min-width: 40px;
-    font-weight: 700;
-    color: var(--primary-color);
-    font-size: 1rem;
+.leaderboard-rank-display {
+    display: flex;
+    align-items: center;
+    min-width: 60px;
+    justify-content: center;
 }
 
 .leaderboard-avatar {
@@ -672,11 +685,6 @@ body {
     color: var(--text-primary);
     font-weight: 600;
     font-size: 0.9rem;
-}
-
-.leaderboard-rank-label {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
 }
 
 .leaderboard-rating {
@@ -1685,4 +1693,79 @@ section h2 {
 
 .current-user-badge {
     background: var(--primary-color);
+}
+
+/* Leaderboard Actions */
+.leaderboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.starred-remove-btn-direct {
+    padding: 6px 8px;
+    background: var(--error-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 28px;
+}
+
+.starred-remove-btn-direct:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.starred-remove-btn-direct i {
+    font-size: 12px;
+}
+
+/* Enhanced leaderboard item layout for actions */
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+    background: var(--surface-light);
+}
+
+.leaderboard-item:hover .leaderboard-actions {
+    opacity: 1;
+}
+
+.starred-user:hover .leaderboard-actions {
+    opacity: 1;
+}
+
+/* Tooltip styling */
+.starred-remove-btn-direct[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    border: 1px solid var(--border-color);
+    margin-bottom: 5px;
 }

@@ -57,19 +57,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update profile elements
         const profileName = document.getElementById('profile-name');
-        const profileRole = document.getElementById('profile-role');
         const profileRankLabel = document.getElementById('profile-rank-label');
+        const profileRankBadge = document.getElementById('profile-rank-badge');
         const profileRating = document.getElementById('profile-rating');
         const profileAvatar = document.getElementById('profile-avatar');
         const globalRank = document.getElementById('global-rank');
         const nextRank = document.getElementById('next-rank');
+        const nextRankBadge = document.getElementById('next-rank-badge');
         const currentPoints = document.getElementById('current-points');
         const nextRankPoints = document.getElementById('next-rank-points');
         const progressFill = document.getElementById('progress-fill');
 
         if (profileName) profileName.textContent = profile.name;
-        if (profileRole) profileRole.textContent = 'Senior Code';
-        if (profileRankLabel) profileRankLabel.textContent = `Rank: ${profile.rank}`;
+        
+        // Update rank badge and label with unified styling
+        if (profileRankBadge && profileRankLabel) {
+            const rankPosition = profile.globalRank || '--';
+            profileRankBadge.textContent = `#${rankPosition}`;
+            profileRankLabel.textContent = profile.rank || 'Loading...';
+            
+            // Apply special styling for top ranks
+            profileRankBadge.className = 'rank-badge large';
+            if (rankPosition === 1) profileRankBadge.classList.add('rank-1');
+            else if (rankPosition === 2) profileRankBadge.classList.add('rank-2');
+            else if (rankPosition === 3) profileRankBadge.classList.add('rank-3');
+        }
+        
         if (profileRating) profileRating.textContent = profile.rating;
         if (profileAvatar) profileAvatar.src = profile.avatar;
         
@@ -85,7 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
             globalRank.textContent = rankText;
         }
         
-        if (nextRank) nextRank.textContent = profile.nextRank;
+        // Update next rank badge
+        if (nextRankBadge && nextRank) {
+            const nextRankText = profile.nextRank || 'Major';
+            nextRankBadge.textContent = '+1';
+            nextRank.textContent = nextRankText;
+        }
+        
         if (currentPoints) currentPoints.textContent = profile.currentPoints;
         if (nextRankPoints) nextRankPoints.textContent = profile.nextRankPoints;
         
@@ -349,13 +368,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const topTen = leaderboard.topUsers.slice(0, 10);
             topTen.forEach(user => {
                 const isCurrentUser = leaderboard.currentUser && user.username === leaderboard.currentUser.username;
+                const rankClass = user.position <= 3 ? `rank-${user.position}` : '';
                 leaderboardHtml += `
                     <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
-                        <div class="leaderboard-rank">#${user.position}</div>
+                        <div class="leaderboard-rank-display">
+                            <div class="rank-badge ${rankClass}">#${user.position}</div>
+                        </div>
                         <img src="${user.avatar}" alt="${user.username}" class="leaderboard-avatar">
                         <div class="leaderboard-info">
                             <div class="leaderboard-name">${user.username} ${isCurrentUser ? '(You)' : ''}</div>
-                            <div class="leaderboard-rank-label">${user.rank}</div>
+                            <div class="rank-label muted">${user.rank}</div>
                         </div>
                         <div class="leaderboard-rating">${user.rating}</div>
                     </div>
@@ -377,13 +399,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (leaderboard.contextUsers && leaderboard.contextUsers.length > 0) {
                 leaderboard.contextUsers.forEach(user => {
                     const isCurrentUser = user.username === leaderboard.currentUser.username;
+                    const rankClass = user.position <= 3 ? `rank-${user.position}` : '';
                     leaderboardHtml += `
                         <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}">
-                            <div class="leaderboard-rank">#${user.position}</div>
+                            <div class="leaderboard-rank-display">
+                                <div class="rank-badge ${rankClass}">#${user.position}</div>
+                            </div>
                             <img src="${user.avatar}" alt="${user.username}" class="leaderboard-avatar">
                             <div class="leaderboard-info">
                                 <div class="leaderboard-name">${user.username} ${isCurrentUser ? '(You)' : ''}</div>
-                                <div class="leaderboard-rank-label">${user.rank}</div>
+                                <div class="rank-label muted">${user.rank}</div>
                             </div>
                             <div class="leaderboard-rating">${user.rating}</div>
                         </div>
@@ -391,13 +416,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 // Fallback: show just current user
+                const currentUserRankClass = leaderboard.currentUser.position <= 3 ? `rank-${leaderboard.currentUser.position}` : '';
                 leaderboardHtml += `
                     <div class="leaderboard-item current-user">
-                        <div class="leaderboard-rank">#${leaderboard.currentUser.position}</div>
+                        <div class="leaderboard-rank-display">
+                            <div class="rank-badge ${currentUserRankClass}">#${leaderboard.currentUser.position}</div>
+                        </div>
                         <img src="${leaderboard.currentUser.avatar_url || '/images/default-avatar.svg'}" alt="${leaderboard.currentUser.username}" class="leaderboard-avatar">
                         <div class="leaderboard-info">
                             <div class="leaderboard-name">${leaderboard.currentUser.username} (You)</div>
-                            <div class="leaderboard-rank-label">${leaderboard.currentUser.rank_label}</div>
+                            <div class="rank-label muted">${leaderboard.currentUser.rank_label}</div>
                         </div>
                         <div class="leaderboard-rating">${leaderboard.currentUser.rating}</div>
                     </div>
@@ -429,21 +457,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (starredData.starred && starredData.starred.length > 0) {
             starredData.starred.forEach(user => {
                 const isCurrentUser = user.isCurrentUser;
+                const rankClass = user.position <= 3 ? `rank-${user.position}` : '';
                 leaderboardHtml += `
                     <div class="leaderboard-item ${isCurrentUser ? 'current-user' : 'starred-user'}">
-                        <div class="leaderboard-rank">#${user.position}</div>
+                        <div class="leaderboard-rank-display">
+                            <div class="rank-badge ${rankClass}">#${user.position}</div>
+                        </div>
                         <img src="${user.avatar}" alt="${user.username}" class="leaderboard-avatar">
                         <div class="leaderboard-info">
                             <div class="leaderboard-name">
                                 ${user.username} 
                                 ${isCurrentUser ? '(You)' : ''}
                             </div>
-                            <div class="leaderboard-rank-label">${user.rank}</div>
+                            <div class="rank-label muted">${user.rank}</div>
                             <div class="user-badges">
                                 ${isCurrentUser ? '<span class="user-badge current-user-badge">You</span>' : '<span class="user-badge starred-badge">Starred</span>'}
                             </div>
                         </div>
                         <div class="leaderboard-rating">${user.rating}</div>
+                        ${!isCurrentUser ? `
+                            <div class="leaderboard-actions">
+                                <button class="starred-remove-btn-direct" 
+                                        data-user-id="${user.id}" 
+                                        data-username="${user.username}"
+                                        title="Unstar ${user.username}">
+                                    <i class="fas fa-star-half-alt"></i>
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -462,6 +503,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         list.innerHTML = leaderboardHtml;
+        
+        // Add event listeners to remove buttons in starred leaderboard
+        list.querySelectorAll('.starred-remove-btn-direct').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const userId = btn.dataset.userId;
+                const username = btn.dataset.username;
+                
+                // Show confirmation dialog with more details
+                const confirmMessage = `Unstar ${username}?\n\nThis will remove them from your starred users list.`;
+                if (confirm(confirmMessage)) {
+                    // Show loading state
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
+                    
+                    try {
+                        await handleStarredAction(userId, 'remove', btn);
+                    } finally {
+                        // Reset button state in case of error
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }
+                }
+            });
+        });
     }
 
     // Legacy function for compatibility
@@ -793,21 +859,30 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 showMessage(result.message, 'success');
                 
-                // Update button state
-                if (action === 'add') {
-                    button.textContent = 'Unstar';
-                    button.className = 'starred-action-btn starred-remove-btn';
-                    button.dataset.action = 'remove';
-                } else {
-                    button.textContent = 'Star User';
-                    button.className = 'starred-action-btn starred-add-btn';
-                    button.dataset.action = 'add';
+                // Update button state (only for search modal buttons, not direct remove buttons)
+                if (button && button.classList.contains('starred-action-btn')) {
+                    if (action === 'add') {
+                        button.textContent = 'Unstar';
+                        button.className = 'starred-action-btn starred-remove-btn';
+                        button.dataset.action = 'remove';
+                    } else {
+                        button.textContent = 'Star User';
+                        button.className = 'starred-action-btn starred-add-btn';
+                        button.dataset.action = 'add';
+                    }
                 }
 
                 // Refresh starred leaderboard if on starred tab
                 const starredTab = document.getElementById('starred-tab');
                 if (starredTab && starredTab.classList.contains('active')) {
                     await loadStarredLeaderboard();
+                }
+                
+                // Also refresh search results if modal is open
+                const modal = document.getElementById('add-starred-modal');
+                const searchInput = document.getElementById('starred-search');
+                if (modal && modal.style.display === 'block' && searchInput && searchInput.value.trim()) {
+                    searchUsers(searchInput.value.trim());
                 }
             } else {
                 showMessage(result.error || 'Failed to update starred status', 'error');

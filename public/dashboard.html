@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - BrainJam Arena</title>
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/rank-components.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +28,7 @@
                 <a href="#" class="nav-link">Practice</a>
                 <a href="#" class="nav-link">Learn</a>
                 <a href="#" class="nav-link">Discuss</a>
-                <a href="#" class="nav-link">Leaderboard</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
             </div>
             
             <div class="nav-user">
@@ -53,12 +54,19 @@
                     </div>
                     <div class="profile-info">
                         <h2 id="profile-name">Loading...</h2>
-                        <p class="profile-rank">
-                            <span id="profile-role">Senior Code</span> | 
-                            <span id="profile-rank-label">Rank: Captain</span>
-                        </p>
-                        <p class="profile-rating">Rating: <span id="profile-rating">1850</span></p>
-                        <p class="profile-global-rank">Global Rank: #<span id="global-rank">342</span></p>
+                        <div class="profile-rank-display">
+                            <div class="rank-badge large" id="profile-rank-badge">--</div>
+                            <div class="profile-rank-info">
+                                <div class="profile-rank-title" id="profile-rank-label">Loading...</div>
+                                <div class="profile-rank-subtitle">Rating: <span id="profile-rating">--</span></div>
+                            </div>
+                        </div>
+                        <div class="rank-container horizontal" style="margin-top: 10px;">
+                            <div class="rank-display">
+                                <i class="fas fa-globe text-primary"></i>
+                                <span class="rank-text">Global Rank: #<span id="global-rank">--</span></span>
+                            </div>
+                        </div>
                         <button class="edit-profile-btn" id="edit-profile-btn">Edit Profile</button>
                         <button class="test-solve-btn" id="test-solve-btn"><i class="fas fa-code"></i> Solve Problem (Test)</button>
                     </div>
@@ -97,14 +105,19 @@
                     </div>
                 </div>
                 
-                <div class="progress-section">
-                    <h3>Progress to Next Rank: <span id="next-rank">Major</span></h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
+                <div class="rank-progress">
+                    <div class="rank-container horizontal">
+                        <span class="rank-label">Progress to Next Rank:</span>
+                        <div class="rank-badge small" id="next-rank-badge">--</div>
+                        <span class="rank-label" id="next-rank">Major</span>
                     </div>
-                    <p class="progress-text">
-                        <span id="current-points">750</span>/<span id="next-rank-points">1000</span> points
-                    </p>
+                    <div class="rank-progress-bar">
+                        <div class="rank-progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="rank-progress-text">
+                        <span><span id="current-points">750</span> points</span>
+                        <span><span id="next-rank-points">1000</span> needed</span>
+                    </div>
                 </div>
             </section>
 
