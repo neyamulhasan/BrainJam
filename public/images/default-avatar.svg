@@ -1,0 +1,10 @@
+<!-- This is a placeholder for the default avatar image -->
+<!-- In a real application, you would place an actual image file here -->
+<!-- For now, we'll use a CSS-based avatar in the dashboard -->
+
+<!-- SVG Avatar placeholder -->
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="60" fill="#00d4ff"/>
+  <circle cx="60" cy="45" r="20" fill="#ffffff"/>
+  <ellipse cx="60" cy="85" rx="25" ry="15" fill="#ffffff"/>
+</svg>

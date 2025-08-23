@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
 const db = require('./config/database');
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Serve HTML pages
 app.get('/', (req, res) => {
@@ -29,6 +31,14 @@ app.get('/login', (req, res) => {
 
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/test-login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test-login.html'));
 });
 
 // Test database connection

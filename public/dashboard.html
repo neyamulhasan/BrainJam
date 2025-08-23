@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="message-container"></div>
@@ -20,10 +21,18 @@
                 <span class="brand-text">BrainJam Arena</span>
             </div>
             
+            <div class="nav-links">
+                <a href="#" class="nav-link">Compete</a>
+                <a href="#" class="nav-link">Practice</a>
+                <a href="#" class="nav-link">Learn</a>
+                <a href="#" class="nav-link">Discuss</a>
+                <a href="#" class="nav-link">Leaderboard</a>
+            </div>
+            
             <div class="nav-user">
-                <div class="user-info">
-                    <span class="user-name" id="user-name">Loading...</span>
-                    <span class="user-rank" id="user-rank">Recruit</span>
+                <div class="search-box">
+                    <input type="text" placeholder="Search">
+                    <span class="search-icon">🔍</span>
                 </div>
                 <button class="logout-btn" id="logout-btn">
                     <span>🚪</span> Logout
@@ -35,147 +44,151 @@
     <!-- Main Dashboard -->
     <main class="dashboard">
         <div class="dashboard-container">
-            <!-- Welcome Section -->
-            <section class="welcome-section">
-                <div class="welcome-header">
-                    <h1>Welcome back, <span id="welcome-name">Soldier</span>!</h1>
-                    <p>Ready to conquer new coding challenges?</p>
+            <!-- Profile Section -->
+            <section class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <img id="profile-avatar" src="/images/default-avatar.svg" alt="Profile Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Loading...</h2>
+                        <p class="profile-rank">
+                            <span id="profile-role">Senior Code</span> | 
+                            <span id="profile-rank-label">Rank: Captain</span>
+                        </p>
+                        <p class="profile-rating">Rating: <span id="profile-rating">1850</span></p>
+                        <p class="profile-global-rank">Global Rank: #<span id="global-rank">342</span></p>
+                        <button class="edit-profile-btn" id="edit-profile-btn">Edit Profile</button>
+                    </div>
                 </div>
                 
+                <!-- Edit Profile Modal -->
+                <div id="edit-profile-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Edit Profile</h3>
+                            <span class="close" id="close-modal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="edit-profile-form">
+                                <div class="form-group">
+                                    <label for="profile-email">Email:</label>
+                                    <input type="email" id="profile-email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-avatar-url">Profile Picture URL:</label>
+                                    <input type="url" id="profile-avatar-url" name="avatar_url" placeholder="https://example.com/your-image.jpg">
+                                    <small>Enter a valid image URL for your profile picture</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preview:</label>
+                                    <div class="avatar-preview">
+                                        <img id="avatar-preview" src="/images/default-avatar.svg" alt="Avatar Preview">
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
+                                    <button type="submit" id="save-profile" class="btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <h3>Progress to Next Rank: <span id="next-rank">Major</span></h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p class="progress-text">
+                        <span id="current-points">750</span>/<span id="next-rank-points">1000</span> points
+                    </p>
+                </div>
+            </section>
+
+            <!-- Match History -->
+            <section class="match-history">
+                <h2>Match History</h2>
+                <div class="table-container">
+                    <table class="match-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opponent</th>
+                                <th>Result</th>
+                                <th>Rating Change</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-history-body">
+                            <tr>
+                                <td colspan="4" class="loading-cell">Loading matches...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Statistics -->
+            <section class="statistics">
+                <h2>Statistics</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div class="stat-content">
-                            <h3>15</h3>
-                            <p>Challenges Completed</p>
-                        </div>
+                        <h3>Problems Solved</h3>
+                        <div class="stat-value" id="problems-solved">0</div>
                     </div>
-                    
                     <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
-                        <div class="stat-content">
-                            <h3>1,247</h3>
-                            <p>Total Points</p>
-                        </div>
+                        <h3>Languages Used</h3>
+                        <div class="stat-value" id="languages-used">0</div>
                     </div>
-                    
                     <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-content">
-                            <h3>87%</h3>
-                            <p>Success Rate</p>
-                        </div>
+                        <h3>Average Solve Time</h3>
+                        <div class="stat-value" id="avg-solve-time">N/A</div>
                     </div>
-                    
                     <div class="stat-card">
-                        <div class="stat-icon">📈</div>
-                        <div class="stat-content">
-                            <h3>#342</h3>
-                            <p>Global Rank</p>
-                        </div>
+                        <h3>Contest Participations</h3>
+                        <div class="stat-value" id="contest-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Contest Wins</h3>
+                        <div class="stat-value" id="win-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Current Streak</h3>
+                        <div class="stat-value" id="streak-days">0</div>
                     </div>
                 </div>
             </section>
 
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <h2>Quick Actions</h2>
-                <div class="actions-grid">
-                    <div class="action-card">
-                        <div class="action-icon">⚔️</div>
-                        <h3>Start Challenge</h3>
-                        <p>Take on a new coding challenge</p>
-                        <button class="action-btn primary">Start Now</button>
-                    </div>
-                    
-                    <div class="action-card">
-                        <div class="action-icon">🏟️</div>
-                        <h3>Join Arena</h3>
-                        <p>Compete with other developers</p>
-                        <button class="action-btn secondary">Enter Arena</button>
-                    </div>
-                    
-                    <div class="action-card">
-                        <div class="action-icon">📊</div>
-                        <h3>View Progress</h3>
-                        <p>Track your learning journey</p>
-                        <button class="action-btn tertiary">View Stats</button>
-                    </div>
+            <!-- Problems Solved by Language Chart -->
+            <section class="language-chart">
+                <h2>Problems Solved by Language</h2>
+                <div class="chart-container">
+                    <canvas id="languageChart"></canvas>
                 </div>
             </section>
 
             <!-- Recent Activity -->
             <section class="recent-activity">
                 <h2>Recent Activity</h2>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon success">✅</div>
-                        <div class="activity-content">
-                            <h4>Array Manipulation Challenge</h4>
-                            <p>Completed in 12 minutes • +150 points</p>
-                            <span class="activity-time">2 hours ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon warning">⚡</div>
-                        <div class="activity-content">
-                            <h4>Speed Challenge Arena</h4>
-                            <p>Ranked #23 out of 156 participants</p>
-                            <span class="activity-time">1 day ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon info">🏆</div>
-                        <div class="activity-content">
-                            <h4>Rank Promotion</h4>
-                            <p>Advanced to Private First Class</p>
-                            <span class="activity-time">3 days ago</span>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon success">✅</div>
-                        <div class="activity-content">
-                            <h4>Algorithm Optimization</h4>
-                            <p>Completed with 95% efficiency • +200 points</p>
-                            <span class="activity-time">1 week ago</span>
-                        </div>
-                    </div>
+                <div class="activity-list" id="activity-list">
+                    <div class="activity-placeholder">Loading recent activity...</div>
                 </div>
             </section>
 
-            <!-- Leaderboard Preview -->
-            <section class="leaderboard-preview">
-                <h2>Global Leaderboard</h2>
-                <div class="leaderboard-list">
-                    <div class="leaderboard-item rank-1">
-                        <span class="rank">#1</span>
-                        <span class="name">CodeMaster_2025</span>
-                        <span class="points">15,847 pts</span>
-                    </div>
-                    
-                    <div class="leaderboard-item rank-2">
-                        <span class="rank">#2</span>
-                        <span class="name">AlgoNinja</span>
-                        <span class="points">14,923 pts</span>
-                    </div>
-                    
-                    <div class="leaderboard-item rank-3">
-                        <span class="rank">#3</span>
-                        <span class="name">DevWarrior</span>
-                        <span class="points">13,756 pts</span>
-                    </div>
-                    
-                    <div class="leaderboard-item">
-                        <span class="rank">#342</span>
-                        <span class="name current-user" id="leaderboard-name">You</span>
-                        <span class="points">1,247 pts</span>
-                    </div>
+            <!-- Achievements -->
+            <section class="achievements">
+                <h2>Achievements</h2>
+                <div class="achievements-grid" id="achievements-grid">
+                    <div class="achievement-placeholder">Loading achievements...</div>
                 </div>
-                
-                <button class="view-full-btn">View Full Leaderboard</button>
+            </section>
+
+            <!-- Leaderboard -->
+            <section class="leaderboard">
+                <h2>Global Leaderboard</h2>
+                <div class="leaderboard-list" id="leaderboard-list">
+                    <div class="leaderboard-placeholder">Loading leaderboard...</div>
+                </div>
             </section>
         </div>
     </main>
