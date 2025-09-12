@@ -252,3 +252,9 @@
 .sort-dropdown:focus {
     outline: none;
 }
+
+/* Active nav link */
+.nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
