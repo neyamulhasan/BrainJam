@@ -934,7 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const user = checkAuth();
         if (!user) return;
 
-        showMessage('Loading dashboard...', 'info');
+        // Initial loading message removed
 
         try {
             await Promise.all([
@@ -946,7 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadLeaderboard()
             ]);
             
-            showMessage('Dashboard loaded successfully!', 'success');
+            // Success message removed
         } catch (error) {
             console.error('Dashboard initialization error:', error);
             showMessage('Failed to load dashboard data', 'error');
