@@ -52,9 +52,20 @@ if errorlevel 1 (
 )
 echo ✅ Database initialized successfully!
 echo.
+echo ⏳ Step 4: Initializing learning categories...
+call npm run init-learning
+if errorlevel 1 (
+    echo ❌ Learning categories initialization failed
+    echo 💡 Make sure MySQL or XAMPP is running
+    pause
+    exit /b 1
+)
+echo ✅ Learning categories initialized successfully!
+echo.
 
-echo ⏳ Step 4: Starting BrainJam Arena...
+echo ⏳ Step 5: Starting BrainJam Arena...
 echo 🔍 Server will check ports 3000 and 3001 for availability
+
 echo 📄 Pages:
 echo    • Home: http://localhost:[3000 or 3001]
 echo    • Register: http://localhost:[3000 or 3001]/register  
@@ -66,7 +77,8 @@ echo    ✅ JWT Authentication
 echo    ✅ Military Rank System
 echo    ✅ Multi-Port MySQL Support
 echo    ✅ Responsive Dark Theme
-echo    ✅ Smart Port Selection (3000/3001 only)
+echo    ✅ Learning Resources Management
+
 echo.
 echo 🔄 Server will use port 3000 or 3001 only
 echo Press Ctrl+C to stop the server

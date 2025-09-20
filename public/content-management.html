@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Management - BrainJam Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/content-management.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            
+            <nav class="nav-menu">
+                <a href="admin-dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="content-management.html" class="nav-item active">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Content Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>Competition Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-code"></i>
+                    <span>Problem Management</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Content Management</h1>
+            <p class="page-description">Manage all platform content, including learning resources, community posts, and static pages.</p>
+
+            <!-- Content Tabs -->
+            <div class="content-tabs">
+                <button class="tab-btn active" data-tab="learning">Learning Resources</button>
+                <button class="tab-btn" data-tab="community">Community Content</button>
+                <button class="tab-btn" data-tab="static">Static Pages</button>
+            </div>
+
+            <!-- Learning Resources Tab Content -->
+            <div class="tab-content active" id="learning-content">
+                <h2>Learning Resources</h2>
+                
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="resource-search" placeholder="Search learning resources...">
+                </div>
+
+                <!-- Resources Table -->
+                <div class="table-container">
+                    <table class="data-table resources-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Published Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resources-table-body">
+                            <tr>
+                                <td>Introduction to Algorithms</td>
+                                <td>Algorithms</td>
+                                <td><span class="status-badge published">Published</span></td>
+                                <td>2023-08-15</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Data Structures Fundamentals</td>
+                                <td>Data Structures</td>
+                                <td><span class="status-badge published">Published</span></td>
+                                <td>2023-07-20</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dynamic Programming Techniques</td>
+                                <td>Algorithms</td>
+                                <td><span class="status-badge draft">Draft</span></td>
+                                <td>N/A</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Advanced Graph Algorithms</td>
+                                <td>Algorithms</td>
+                                <td><span class="status-badge published">Published</span></td>
+                                <td>2023-06-10</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>System Design Principles</td>
+                                <td>System Design</td>
+                                <td><span class="status-badge published">Published</span></td>
+                                <td>2023-05-05</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Create New Resource Button -->
+                <div class="button-container">
+                    <a href="create-resource.html" class="primary-btn create-resource-btn">Create New Resource</a>
+                </div>
+            </div>
+
+            <!-- Community Content Tab Content -->
+            <div class="tab-content" id="community-content">
+                <h2>Community Content</h2>
+                <p class="coming-soon">Community content management coming soon...</p>
+            </div>
+
+            <!-- Static Pages Tab Content -->
+            <div class="tab-content" id="static-content">
+                <h2>Static Pages</h2>
+                <p class="coming-soon">Static pages management coming soon...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Editor Modal -->
+    <div class="modal" id="resource-editor-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Learning Resource</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="resource-form">
+                    <input type="hidden" id="resource-id">
+                    
+                    <div class="form-group">
+                        <label for="resource-title">Title</label>
+                        <input type="text" id="resource-title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-category">Category</label>
+                        <select id="resource-category" required>
+                            <option value="">Select Category</option>
+                            <option value="1">Algorithms</option>
+                            <option value="2">Data Structures</option>
+                            <option value="3">System Design</option>
+                            <option value="4">Web Development</option>
+                            <option value="5">Mobile Development</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-content">Content</label>
+                        <textarea id="resource-content" rows="10" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-status">Status</label>
+                        <select id="resource-status" required>
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                        <button type="submit" class="primary-btn save-btn">Save Resource</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script src="js/content-management.js"></script>
+</body>
+</html>
