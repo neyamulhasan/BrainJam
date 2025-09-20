@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="css/learn.css">
+    <link rel="stylesheet" href="css/rank-components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="message-container"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" class="nav-link">Compete</a>
+                <a href="#" class="nav-link">Practice</a>
+                <a href="learn.html" class="nav-link active">Learn</a>
+                <a href="#" class="nav-link">Discuss</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+                <a href="/geek-feed" class="nav-link">Geek Feed</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="search-box">
+                    <input type="text" placeholder="Search resources..." id="resource-search">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                </div>
+                <a href="dashboard.html" class="profile-icon-btn">
+                    <img src="images/default-avatar.svg" alt="Profile">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Learn Content -->
+    <main class="leaderboard-main">
+        <div class="container">
+            <!-- Learn Header -->
+            <header class="leaderboard-header">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Learning Hub
+                    </h1>
+                    <p class="page-subtitle">Master programming concepts with our curated resources</p>
+                </div>
+                
+                <div class="leaderboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-resources">0</span>
+                            <span class="stat-label">Total Resources</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-categories">0</span>
+                            <span class="stat-label">Categories</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card your-rank-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-read-time">0</span>
+                            <span class="stat-label">Minutes of Content</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Category Filter Section -->
+            <section class="category-filter-section">
+                <div class="category-header">
+                    <h2><i class="fas fa-filter"></i> Browse by Category</h2>
+                </div>
+                <div class="category-list" id="category-list">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading categories...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Learn Controls -->
+            <div class="leaderboard-controls">
+                <div class="control-tabs">
+                    <button class="control-tab active" data-tab="all">
+                        <i class="fas fa-list"></i>
+                        All Resources
+                    </button>
+                    <button class="control-tab" data-tab="popular">
+                        <i class="fas fa-fire"></i>
+                        Most Popular
+                    </button>
+                    <button class="control-tab" data-tab="recent">
+                        <i class="fas fa-clock"></i>
+                        Recently Added
+                    </button>
+                </div>
+                
+                <div class="control-actions">
+                    <div class="filter-dropdown">
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-dropdown">
+                        <select id="sort-filter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="popular">Most Popular</option>
+                            <option value="title">Title A-Z</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Learn Content -->
+            <div class="leaderboard-content">
+                <!-- All Resources -->
+                <div class="tab-content active" id="all-content">
+                    <div class="resources-grid" id="resources-grid">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading learning resources...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Resources -->
+                <div class="tab-content" id="popular-content">
+                    <div class="resources-grid" id="popular-resources-grid">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading popular resources...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Resources -->
+                <div class="tab-content" id="recent-content">
+                    <div class="resources-grid" id="recent-resources-grid">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading recent resources...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prev-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </button>
+                
+                <div class="page-info">
+                    <span>Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+                </div>
+                
+                <button class="page-btn" id="next-btn">
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Resource Detail Modal -->
+        <div id="resource-modal" class="modal">
+            <div class="modal-content large-modal">
+                <div class="modal-header">
+                    <h3 id="modal-title"><i class="fas fa-book"></i> Resource Details</h3>
+                    <span class="close" id="close-resource-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="resource-detail" id="resource-detail">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading resource...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/learn.js"></script>
+</body>
+</html>
