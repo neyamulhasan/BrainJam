@@ -226,16 +226,6 @@ router.put('/learning-resources/:id', upload.single('featured_image'), async (re
             }
         }
         
-        console.log('Update request received:', {
-            resourceId,
-            title,
-            category_id,
-            status,
-            contentLength: content.length,
-            metaDescription,
-            tags,
-            hasFile: !!req.file
-        });
         
         // Check if resource exists
         const [existingResources] = await db.execute('SELECT * FROM learning_resources WHERE id = ?', [resourceId]);
@@ -304,7 +294,7 @@ router.put('/learning-resources/:id', upload.single('featured_image'), async (re
                 resourceId
             ]);
             
-            console.log('Resource updated successfully');
+            // Success - resource updated
             
             // Update tags
             await db.execute('DELETE FROM learning_resource_tags WHERE resource_id = ?', [resourceId]);
