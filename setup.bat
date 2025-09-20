@@ -53,7 +53,18 @@ if errorlevel 1 (
 echo ✅ Database initialized successfully!
 echo.
 
-echo ⏳ Step 4: Starting BrainJam Arena...
+echo ⏳ Step 4: Initializing learning categories...
+call npm run init-learning
+if errorlevel 1 (
+    echo ❌ Learning categories initialization failed
+    echo 💡 Make sure MySQL or XAMPP is running
+    pause
+    exit /b 1
+)
+echo ✅ Learning categories initialized successfully!
+echo.
+
+echo ⏳ Step 5: Starting BrainJam Arena...
 echo � Server will be available at: http://localhost:3000
 echo 📄 Pages:
 echo    • Home: http://localhost:3000
@@ -66,6 +77,7 @@ echo    ✅ JWT Authentication
 echo    ✅ Military Rank System
 echo    ✅ Multi-Port MySQL Support
 echo    ✅ Responsive Dark Theme
+echo    ✅ Learning Resources Management
 echo.
 echo Press Ctrl+C to stop the server
 echo.

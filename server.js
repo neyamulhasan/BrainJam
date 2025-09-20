@@ -59,6 +59,10 @@ app.get('/create-resource', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'create-resource.html'));
 });
 
+app.get('/test-learning-api', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test-learning-api.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
