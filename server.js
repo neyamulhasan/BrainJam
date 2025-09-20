@@ -7,6 +7,8 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const geekFeedRoutes = require('./routes/geek_feed');
+const adminRoutes = require('./routes/admin');
+const learningRoutes = require('./routes/learning');
 const db = require('./config/database');
 
 const app = express();
@@ -58,6 +60,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/geek-feed', geekFeedRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/learning', learningRoutes);
 
 // Serve HTML pages
 app.get('/', (req, res) => {
@@ -78,6 +82,22 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/geek-feed', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'geek-feed.html'));
+});
+
+app.get('/admin-dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+});
+
+app.get('/content-management', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'content-management.html'));
+});
+
+app.get('/create-resource', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'create-resource.html'));
+});
+
+app.get('/test-learning-api', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test-learning-api.html'));
 });
 
 // Error handling middleware
