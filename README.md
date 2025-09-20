@@ -10,7 +10,8 @@ A competitive programming platform where coders train, compete, and conquer chal
 - 🎨 **Modern Dark UI** - Professional, responsive design
 - 🏆 **Military Rank System** - Progress from Private Recruit to Legendary General
 - 🔄 **Multi-Port MySQL** - Supports both standard MySQL (3306) and XAMPP (4306)
-- 🛡️ **Security Features** - Password hashing, input validation, XSS protection
+- � **Auto Port Detection** - Automatically finds available ports (3000-3009)
+- �🛡️ **Security Features** - Password hashing, input validation, XSS protection
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile
 
 ## 🚀 Quick Start
