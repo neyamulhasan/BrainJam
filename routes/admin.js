@@ -43,52 +43,57 @@ router.get('/stats', async (req, res) => {
 // Get recent activity
 router.get('/activity', async (req, res) => {
     try {
-        // Get recent activity from activity_log table, limit to 10 most recent entries
-        const [activityResult] = await db.execute(`
-            SELECT a.*, u.username
-            FROM activity_log a
-            LEFT JOIN users u ON a.user_id = u.id
-            ORDER BY a.timestamp DESC
-            LIMIT 10
+        // Get recent activity from existing tables instead of non-existent activity_log
+        const [recentSubmissions] = await db.execute(`
+            SELECT 
+                u.username,
+                CASE 
+                    WHEN s.status = 'Accepted' THEN 'Problem Solved'
+                    WHEN s.status = 'Wrong Answer' THEN 'Attempted Problem'
+                    WHEN s.status = 'Compilation Error' THEN 'Compilation Error'
+                    ELSE 'Code Submitted'
+                END as action,
+                s.created_at as timestamp
+            FROM submissions s
+            LEFT JOIN users u ON s.user_id = u.id
+            ORDER BY s.created_at DESC
+            LIMIT 5
         `);
         
-        // If activity_log table doesn't exist, return sample data for now
-        if (activityResult.length === 0) {
-            return res.json({
-                success: true,
-                activities: [
-                    { 
-                        username: 'Ethan Carter', 
-                        action: 'User registered', 
-                        timestamp: '2023-09-20 10:00:00' 
-                    },
-                    { 
-                        username: 'Olivia Bennett', 
-                        action: 'Submitted solution', 
-                        timestamp: '2023-09-20 10:15:00' 
-                    },
-                    { 
-                        username: 'Liam Harper', 
-                        action: 'Created competition', 
-                        timestamp: '2023-09-20 10:30:00' 
-                    },
-                    { 
-                        username: 'Ava Foster', 
-                        action: 'Added problem', 
-                        timestamp: '2023-09-20 10:45:00' 
-                    },
-                    { 
-                        username: 'Noah Clark', 
-                        action: 'Updated content', 
-                        timestamp: '2023-09-20 11:00:00' 
-                    }
-                ]
-            });
-        }
+        // Get recent user registrations
+        const [recentUsers] = await db.execute(`
+            SELECT 
+                username,
+                'User Registered' as action,
+                created_at as timestamp
+            FROM users
+            ORDER BY created_at DESC
+            LIMIT 5
+        `);
+        
+        // Get recent posts from geek feed
+        const [recentPosts] = await db.execute(`
+            SELECT 
+                u.username,
+                'Posted in Geek Feed' as action,
+                p.created_at as timestamp
+            FROM posts p
+            LEFT JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+            LIMIT 5
+        `);
+        
+        // Combine all activities and sort by timestamp
+        const allActivities = [
+            ...recentSubmissions,
+            ...recentUsers,
+            ...recentPosts
+        ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+         .slice(0, 10);
         
         res.json({
             success: true,
-            activities: activityResult
+            activities: allActivities
         });
     } catch (error) {
         console.error('Error fetching admin activity:', error);
