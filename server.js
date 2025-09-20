@@ -9,6 +9,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const geekFeedRoutes = require('./routes/geek_feed');
 const adminRoutes = require('./routes/admin');
 const learningRoutes = require('./routes/learning');
+const learnRoutes = require('./routes/learn');
 const db = require('./config/database');
 
 const app = express();
@@ -62,6 +63,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/geek-feed', geekFeedRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/learning', learningRoutes);
+app.use('/api/learn', learnRoutes);
 
 // Serve HTML pages
 app.get('/', (req, res) => {
@@ -78,6 +80,10 @@ app.get('/register', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/learn', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'learn.html'));
 });
 
 app.get('/geek-feed', (req, res) => {
