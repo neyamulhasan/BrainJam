@@ -93,9 +93,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 showMessage('Login successful! Welcome back to BrainJam Arena!', 'success');
                 
-                // Redirect to dashboard
+                // Redirect based on user role
                 setTimeout(() => {
-                    window.location.href = '/dashboard.html';
+                    // Check if user is admin
+                    if (result.user.role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else {
+                        window.location.href = '/dashboard.html';
+                    }
                 }, 1500);
             } else {
                 if (result.errors) {

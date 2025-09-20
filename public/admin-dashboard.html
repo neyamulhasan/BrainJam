@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BrainJam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            
+            <nav class="nav-menu">
+                <a href="admin-dashboard.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="content-management.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Content Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>Competition Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-code"></i>
+                    <span>Problem Management</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Dashboard</h1>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stats-card">
+                    <h3>Total Users</h3>
+                    <div class="stats-value" id="total-users">1,234</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Active Competitions</h3>
+                    <div class="stats-value" id="active-competitions">5</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Total Problems</h3>
+                    <div class="stats-value" id="total-problems">567</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <section class="section">
+                <h2>Quick Actions</h2>
+                <div class="actions-container">
+                    <button class="action-btn primary-btn">Create Competition</button>
+                    <button class="action-btn secondary-btn">Add Problem</button>
+                </div>
+            </section>
+
+            <!-- Recent Activity Table -->
+            <section class="section">
+                <h2>Recent Activity</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-table-body">
+                            <tr>
+                                <td>Ethan Carter</td>
+                                <td>User registered</td>
+                                <td>2023-09-20 10:00</td>
+                            </tr>
+                            <tr>
+                                <td>Olivia Bennett</td>
+                                <td>Submitted solution</td>
+                                <td>2023-09-20 10:15</td>
+                            </tr>
+                            <tr>
+                                <td>Liam Harper</td>
+                                <td>Created competition</td>
+                                <td>2023-09-20 10:30</td>
+                            </tr>
+                            <tr>
+                                <td>Ava Foster</td>
+                                <td>Added problem</td>
+                                <td>2023-09-20 10:45</td>
+                            </tr>
+                            <tr>
+                                <td>Noah Clark</td>
+                                <td>Updated content</td>
+                                <td>2023-09-20 11:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
