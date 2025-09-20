@@ -258,6 +258,72 @@ CREATE TABLE `user_stats` (
   `streak_days` int(11) NOT NULL DEFAULT 0,
   `last_active_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Learning Resources Schema Update for BrainJam
+-- This SQL script adds tables for managing learning resources
+
+-- Table for learning resource categories
+CREATE TABLE IF NOT EXISTS `learning_categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `description` text,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table for learning resources (tutorials, articles, etc.)
+CREATE TABLE IF NOT EXISTS `learning_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `status` enum('draft','published','archived') NOT NULL DEFAULT 'draft',
+  `author_id` int(11) NOT NULL,
+  `featured_image` varchar(255) DEFAULT NULL,
+  `meta_description` varchar(255) DEFAULT NULL,
+  `view_count` int(11) NOT NULL DEFAULT '0',
+  `estimated_read_time` int(11) DEFAULT NULL,
+  `published_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `category_id` (`category_id`),
+  KEY `author_id` (`author_id`),
+  CONSTRAINT `learning_resources_category_fk` FOREIGN KEY (`category_id`) REFERENCES `learning_categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `learning_resources_author_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table for learning resource votes (upvotes/downvotes)
+CREATE TABLE IF NOT EXISTS `learning_resource_votes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `vote_type` enum('upvote','downvote') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `resource_user_unique` (`resource_id`,`user_id`),
+  KEY `resource_id` (`resource_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `learning_resource_votes_resource_fk` FOREIGN KEY (`resource_id`) REFERENCES `learning_resources` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `learning_resource_votes_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table for learning resource tags
+CREATE TABLE IF NOT EXISTS `learning_resource_tags` (
+  `resource_id` int(11) NOT NULL,
+  `tag` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`resource_id`,`tag`),
+  CONSTRAINT `learning_resource_tags_fk` FOREIGN KEY (`resource_id`) REFERENCES `learning_resources` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+
 ALTER TABLE `badges`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
