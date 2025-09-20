@@ -54,11 +54,11 @@ echo ✅ Database initialized successfully!
 echo.
 
 echo ⏳ Step 4: Starting BrainJam Arena...
-echo � Server will be available at: http://localhost:3000
+echo 🔍 Server will check ports 3000 and 3001 for availability
 echo 📄 Pages:
-echo    • Home: http://localhost:3000
-echo    • Register: http://localhost:3000/register  
-echo    • Login: http://localhost:3000/login
+echo    • Home: http://localhost:[3000 or 3001]
+echo    • Register: http://localhost:[3000 or 3001]/register  
+echo    • Login: http://localhost:[3000 or 3001]/login
 echo.
 echo 🛡️ Features Ready:
 echo    ✅ User Registration & Login
@@ -66,7 +66,9 @@ echo    ✅ JWT Authentication
 echo    ✅ Military Rank System
 echo    ✅ Multi-Port MySQL Support
 echo    ✅ Responsive Dark Theme
+echo    ✅ Smart Port Selection (3000/3001 only)
 echo.
+echo 🔄 Server will use port 3000 or 3001 only
 echo Press Ctrl+C to stop the server
 echo.
 call npm run dev
