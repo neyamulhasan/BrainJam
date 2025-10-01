@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainJam Practice</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/leaderboard.css">
+  <link rel="stylesheet" href="css/practice.css">
+  <link rel="stylesheet" href="css/rank-components.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Include marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+  <div id="message-container"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon"><i class="fas fa-brain"></i></span>
+        <span class="brand-text">BrainJam</span>
+      </div>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Compete</a>
+        <a href="#" class="nav-link active">Practice</a>
+        <a href="learn.html" class="nav-link">Learn</a>
+        <a href="#" class="nav-link">Discuss</a>
+        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+        <a href="/geek-feed" class="nav-link">Geek Feed</a>
+      </div>
+      <div class="nav-user">
+        <div class="search-box">
+          <input type="text" placeholder="Search resources..." id="resource-search">
+          <span class="search-icon"><i class="fas fa-search"></i></span>
+        </div>
+        <a href="dashboard.html" class="profile-icon-btn">
+          <img src="images/default-avatar.svg" alt="Profile">
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Practice Section -->
+  <section class="practice-section container">
+    <h2>Practice</h2>
+    <input type="text" id="search-bar" class="search-bar" placeholder="Search for challenges">
+
+    <div class="filter-tabs">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="in-progress">In Progress</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+    </div>
+
+    <h3>Difficulty</h3>
+    <div class="difficulty-filters">
+      <button class="difficulty-btn active" data-difficulty="">All</button>
+      <button class="difficulty-btn" data-difficulty="Beginner">Easy</button>
+      <button class="difficulty-btn" data-difficulty="Intermediate">Medium</button>
+      <button class="difficulty-btn" data-difficulty="Advanced">Hard</button>
+    </div>
+
+    <div class="challenge-table">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Topics</th>
+            <th>Difficulty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be inserted dynamically -->
+        </tbody>
+      </table>
+  </section>
+
+  <!-- Practice JS -->
+  <script src="js/practice.js"></script>
+</body>
+
+</html>
