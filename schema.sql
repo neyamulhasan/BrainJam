@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Sep 20, 2025 at 09:51 PM
+-- Host: 127.0.0.1:4306
+-- Generation Time: Oct 08, 2025 at 05:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,6 +34,17 @@ CREATE TABLE `badges` (
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `badges`
+--
+
+INSERT INTO `badges` (`id`, `code`, `name`, `description`) VALUES
+(1, 'FIRST_ACCEPTED', 'First Accepted', 'Earned after first accepted submission.'),
+(2, 'TEN_SOLVES', '10 Solves', 'Solve 10 problems.'),
+(3, 'FIRST_CONTEST', 'First Contest', 'Participate in your first contest.'),
+(4, 'contest_warrior', 'Contest Warrior', 'Participated in 5 contests'),
+(5, 'problem_crusher', 'Problem Crusher', 'Solved 100+ problems');
+
 -- --------------------------------------------------------
 
 --
@@ -56,6 +67,15 @@ CREATE TABLE `contests` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `contests`
+--
+
+INSERT INTO `contests` (`id`, `title`, `description`, `start_time`, `end_time`, `visibility`, `access_code`, `share_token`, `is_virtual`, `based_on_contest_id`, `rating_effect`, `created_by`, `created_at`) VALUES
+(1, 'Brain Jam Beta #1', 'Kickoff contest with 3 problems.', '2025-08-20 14:00:00', '2025-08-20 16:00:00', 'public', NULL, 'BETA1XYZ', 0, NULL, 1, 1, '2025-08-16 17:56:05'),
+(2, 'Weekly Contest 2', 'Weekly coding contest', '2024-07-21 10:00:00', '2024-07-21 12:00:00', 'public', NULL, NULL, 0, NULL, 1, NULL, '2025-08-23 13:54:46'),
+(3, 'Weekly Contest 3', 'Weekly coding contest', '2024-07-22 10:00:00', '2024-07-22 12:00:00', 'public', NULL, NULL, 0, NULL, 1, NULL, '2025-08-23 13:54:46');
+
 -- --------------------------------------------------------
 
 --
@@ -67,6 +87,15 @@ CREATE TABLE `contest_participants` (
   `user_id` int(11) NOT NULL,
   `joined_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `contest_participants`
+--
+
+INSERT INTO `contest_participants` (`contest_id`, `user_id`, `joined_at`) VALUES
+(1, 2, '2025-08-16 23:56:05'),
+(1, 3, '2025-08-16 23:56:05'),
+(1, 4, '2025-08-16 23:56:05');
 
 -- --------------------------------------------------------
 
@@ -80,6 +109,15 @@ CREATE TABLE `contest_problems` (
   `display_order` int(11) NOT NULL,
   `points` int(11) NOT NULL DEFAULT 100
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `contest_problems`
+--
+
+INSERT INTO `contest_problems` (`contest_id`, `problem_id`, `display_order`, `points`) VALUES
+(1, 1, 1, 100),
+(1, 2, 2, 200),
+(1, 3, 3, 300);
 
 -- --------------------------------------------------------
 
@@ -96,6 +134,15 @@ CREATE TABLE `contest_scores` (
   `last_submission_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `contest_scores`
+--
+
+INSERT INTO `contest_scores` (`contest_id`, `user_id`, `score`, `penalty_seconds`, `rank`, `last_submission_at`) VALUES
+(1, 2, 300, 600, 1, '2025-08-20 15:05:00'),
+(1, 3, 0, 0, 3, NULL),
+(1, 4, 200, 240, 2, '2025-08-20 14:40:00');
+
 -- --------------------------------------------------------
 
 --
@@ -109,6 +156,13 @@ CREATE TABLE `daily_suggestions` (
   `suggested_on` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `daily_suggestions`
+--
+
+INSERT INTO `daily_suggestions` (`id`, `user_id`, `problem_id`, `suggested_on`) VALUES
+(1, 2, 2, '2025-08-16');
+
 -- --------------------------------------------------------
 
 --
@@ -120,6 +174,18 @@ CREATE TABLE `friends` (
   `friend_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `friends`
+--
+
+INSERT INTO `friends` (`user_id`, `friend_id`, `created_at`) VALUES
+(2, 3, '2025-08-16 17:56:05'),
+(2, 4, '2025-08-16 17:56:05'),
+(3, 2, '2025-08-16 17:56:05'),
+(4, 2, '2025-08-16 17:56:05'),
+(7, 42, '2025-08-23 16:21:17'),
+(7, 43, '2025-08-23 16:21:17');
 
 -- --------------------------------------------------------
 
@@ -133,6 +199,16 @@ CREATE TABLE `languages` (
   `judge0_id` int(11) NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `languages`
+--
+
+INSERT INTO `languages` (`id`, `name`, `judge0_id`, `is_active`) VALUES
+(1, 'C++ (GCC 9.2.0)', 54, 1),
+(2, 'Python (3.8.1)', 71, 1),
+(3, 'JavaScript (Node.js 12.14.0)', 63, 1),
+(5, 'C', 50, 1);
 
 -- --------------------------------------------------------
 
@@ -148,6 +224,17 @@ CREATE TABLE `learning_categories` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `learning_categories`
+--
+
+INSERT INTO `learning_categories` (`id`, `name`, `slug`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'Algorithms', 'algorithms', 'Fundamental algorithms and techniques for solving computational problems', '2025-09-20 13:39:48', '2025-09-20 13:39:48'),
+(2, 'Data Structures', 'data-structures', 'Essential data structures for efficient data organization and retrieval', '2025-09-20 13:39:48', '2025-09-20 13:39:48'),
+(3, 'System Design', 'system-design', 'Principles and patterns for designing scalable systems', '2025-09-20 13:39:48', '2025-09-20 13:39:48'),
+(4, 'Web Development', 'web-development', 'Technologies and frameworks for building web applications', '2025-09-20 13:39:48', '2025-09-20 13:39:48'),
+(5, 'Mobile Development', 'mobile-development', 'App development for iOS, Android, and cross-platform frameworks', '2025-09-20 13:39:48', '2025-09-20 13:39:48');
 
 -- --------------------------------------------------------
 
@@ -171,6 +258,14 @@ CREATE TABLE `learning_resources` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `learning_resources`
+--
+
+INSERT INTO `learning_resources` (`id`, `title`, `slug`, `content`, `category_id`, `status`, `author_id`, `featured_image`, `meta_description`, `view_count`, `estimated_read_time`, `published_at`, `created_at`, `updated_at`) VALUES
+(2, 'Data Structure Fundamentals', 'data-structure-fundamentals-84', '<p><strong>Data structures</strong> are systematic ways of organizing, managing, and storing data so that it can be accessed and modified efficiently. They provide the foundation for designing efficient algorithms and enable programmers to handle large and complex datasets effectively. Common examples include arrays, linked lists, stacks, queues, trees, and graphs—each suited for different types of operations and problem-solving scenarios. Understanding data structures is essential because the choice of structure directly impacts the performance of a program in terms of speed and memory usage.</p><p>The study of data structures also introduces important concepts such as abstraction, dynamic memory allocation, and data relationships. For instance, stacks and queues follow specific principles like Last-In-First-Out (LIFO) and First-In-First-Out (FIFO), respectively, which make them useful in scenarios such as function calls, undo operations, and task scheduling. Similarly, advanced structures like trees and graphs allow efficient representation of hierarchical data and networks, forming the basis for applications such as file systems, routing, and social networks.</p><p>Ultimately, mastering data structure fundamentals equips learners with the tools to design solutions that are both effective and optimized. By choosing the right data structure for a given problem, developers can minimize computational costs, ensure scalability, and improve the overall efficiency of their software systems.</p>', 2, 'draft', 46, NULL, '', 0, 2, NULL, '2025-09-20 14:33:20', '2025-09-20 14:33:20'),
+(3, 'Introduction to Algorithms', 'introduction-to-algorithms-163', '<p>An algorithm is a well-defined sequence of steps or instructions that helps in solving a problem or accomplishing a specific task. In computer science, algorithms serve as the backbone of programming, providing systematic approaches to handle operations ranging from basic arithmetic calculations to highly complex processes such as artificial intelligence. The importance of algorithms lies in their ability to break down problems into smaller, manageable parts, making them easier to understand and solve.</p><p>Algorithms are not only about finding solutions but also about finding efficient solutions. Since multiple algorithms may exist for the same problem, computer scientists focus on analyzing their performance using measures such as time complexity and space complexity. This analysis helps in choosing the most suitable algorithm depending on the problem constraints and available resources. For example, sorting algorithms like Quick Sort and Merge Sort achieve similar goals but differ in efficiency depending on the dataset.</p><p>In today’s world, algorithms have become an inseparable part of technology and daily life. They power search engines, recommend content on social media, secure information through cryptography, and enable innovations in fields like healthcare and robotics. By studying algorithms, learners gain not only problem-solving skills but also the ability to design optimized solutions that drive modern computing.</p>', 1, 'published', 46, '/uploads/learning/resource-1758381645621-666317679.jpg', NULL, 2, 2, '2025-09-20 16:00:46', '2025-09-20 15:20:45', '2025-09-26 12:23:37');
 
 -- --------------------------------------------------------
 
@@ -214,6 +309,13 @@ CREATE TABLE `plagiarism_findings` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `plagiarism_findings`
+--
+
+INSERT INTO `plagiarism_findings` (`id`, `submission_id_a`, `submission_id_b`, `similarity_percent`, `method`, `flagged_by`, `created_at`) VALUES
+(1, 1, 4, 92.50, 'string-match', 1, '2025-08-16 17:56:05');
+
 -- --------------------------------------------------------
 
 --
@@ -226,6 +328,13 @@ CREATE TABLE `posts` (
   `content` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `posts`
+--
+
+INSERT INTO `posts` (`id`, `user_id`, `content`, `created_at`) VALUES
+(1, 7, 'hello, this is my first post.', '2025-08-23 19:05:15');
 
 -- --------------------------------------------------------
 
@@ -240,6 +349,13 @@ CREATE TABLE `post_reactions` (
   `reaction_type` enum('like','dislike') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `post_reactions`
+--
+
+INSERT INTO `post_reactions` (`id`, `post_id`, `user_id`, `reaction_type`, `created_at`) VALUES
+(1, 1, 7, 'like', '2025-08-23 19:05:17');
 
 -- --------------------------------------------------------
 
@@ -279,6 +395,13 @@ CREATE TABLE `practice_runs` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `practice_runs`
+--
+
+INSERT INTO `practice_runs` (`id`, `user_id`, `problem_id`, `language_id`, `source_code`, `stdin`, `stdout`, `stderr`, `status`, `execution_time_ms`, `memory_kb`, `judge0_token`, `created_at`) VALUES
+(1, 2, 1, 2, 'print(sum(map(int,input().split())))', '10 20', '30', '', 'Accepted', 8, 9000, 'tok_prac', '2025-08-16 17:56:05');
+
 -- --------------------------------------------------------
 
 --
@@ -301,6 +424,16 @@ CREATE TABLE `problems` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `problems`
+--
+
+INSERT INTO `problems` (`id`, `slug`, `title`, `body_md`, `input_format`, `output_format`, `constraints_md`, `difficulty`, `time_limit_ms`, `memory_limit_kb`, `is_public`, `created_by`, `created_at`) VALUES
+(1, 'sum-it-up', 'Sum It Up', 'Sum It Up\r\nGiven two integers A and B, output A+B.', 'Two space-separated integers A and B (|A|,|B| ≤ 10^9).', 'One integer: A+B.', 'A+B within 64-bit signed integer range.', 'Easy', 1000, 262144, 1, 1, '2025-08-16 17:56:05'),
+(2, 'balanced-brackets', 'Balanced Brackets', 'Balanced Brackets\r\nCheck if a string of brackets is balanced.', 'One line with a string of brackets ()[]{} (length ≤ 1e5).', '\"YES\" if balanced else \"NO\".', 'Use stack; O(n).', 'Medium', 2000, 262144, 1, 1, '2025-08-16 17:56:05'),
+(3, 'shortest-path', 'Shortest Path', 'Shortest Path\r\nGiven an unweighted graph, find shortest distance from 1 to N.', 'First line N M; then M edges u v (1-indexed).', 'Shortest distance from 1 to N or -1 if unreachable.', 'N ≤ 2e5, M ≤ 2e5; BFS.', 'Hard', 2000, 262144, 1, 1, '2025-08-16 17:56:05'),
+(4, 'two-sum', 'Two Sum', 'Two Sum Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.', 'First line contains n (array size) and target separated by space. Second line contains n space-separated integers', 'Two space-separated integers representing the indices', NULL, 'Easy', 1000, 262144, 1, NULL, '2025-10-01 16:30:03');
+
 -- --------------------------------------------------------
 
 --
@@ -313,6 +446,19 @@ CREATE TABLE `problem_difficulty_votes` (
   `score` tinyint(4) NOT NULL CHECK (`score` between 1 and 5),
   `voted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `problem_difficulty_votes`
+--
+
+INSERT INTO `problem_difficulty_votes` (`problem_id`, `user_id`, `score`, `voted_at`) VALUES
+(1, 2, 1, '2025-08-16 17:56:05'),
+(1, 3, 1, '2025-08-16 17:56:05'),
+(2, 2, 3, '2025-08-16 17:56:05'),
+(2, 3, 4, '2025-08-16 17:56:05'),
+(2, 4, 3, '2025-08-16 17:56:05'),
+(3, 3, 5, '2025-08-16 17:56:05'),
+(3, 4, 4, '2025-08-16 17:56:05');
 
 -- --------------------------------------------------------
 
@@ -329,6 +475,19 @@ CREATE TABLE `problem_examples` (
   `explanation` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `problem_examples`
+--
+
+INSERT INTO `problem_examples` (`id`, `problem_id`, `example_order`, `input_text`, `output_text`, `explanation`) VALUES
+(1, 1, 1, '2 3', '5', '2+3=5'),
+(2, 1, 2, '-7 4', '-3', '-7+4=-3'),
+(3, 2, 1, '([]){}', 'YES', 'All brackets matched'),
+(4, 2, 2, '([)]', 'NO', 'Mismatched nesting'),
+(5, 3, 1, '4 3\n1 2\n2 3\n3 4', '3', '1→2→3→4 distance 3'),
+(6, 4, 1, '4 9\n2 7 11 15', '0 1', 'Because nums[0] + nums[1] == 9, we return [0, 1].'),
+(7, 4, 2, '3 6\n3 2 4', '1 2', 'Because nums[1] + nums[2] == 6, we return [1, 2].');
+
 -- --------------------------------------------------------
 
 --
@@ -339,6 +498,18 @@ CREATE TABLE `problem_tags` (
   `problem_id` int(11) NOT NULL,
   `tag_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `problem_tags`
+--
+
+INSERT INTO `problem_tags` (`problem_id`, `tag_id`) VALUES
+(1, 4),
+(2, 3),
+(2, 5),
+(3, 2),
+(4, 4),
+(4, 6);
 
 -- --------------------------------------------------------
 
@@ -356,6 +527,20 @@ CREATE TABLE `rating_history` (
   `reason` enum('contest','problem_solve','manual') NOT NULL DEFAULT 'contest',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `rating_history`
+--
+
+INSERT INTO `rating_history` (`id`, `user_id`, `contest_id`, `rating_before`, `rating_after`, `delta`, `reason`, `created_at`) VALUES
+(190, 7, NULL, 972, 1063, 91, 'problem_solve', '2025-08-23 18:31:07'),
+(191, 7, NULL, 1063, 1184, 121, 'problem_solve', '2025-08-23 18:31:07'),
+(192, 7, NULL, 1184, 1283, 99, 'problem_solve', '2025-08-23 18:31:23'),
+(193, 7, NULL, 1283, 1384, 101, 'problem_solve', '2025-09-21 03:42:09'),
+(194, 7, NULL, 1384, 1443, 59, 'problem_solve', '2025-09-21 03:42:10'),
+(195, 7, NULL, 1443, 1545, 102, 'problem_solve', '2025-09-21 03:42:10'),
+(196, 7, NULL, 1545, 1657, 112, 'problem_solve', '2025-09-21 03:42:11'),
+(197, 7, NULL, 1657, 1728, 71, 'problem_solve', '2025-09-21 03:42:11');
 
 -- --------------------------------------------------------
 
@@ -382,6 +567,17 @@ CREATE TABLE `submissions` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `submissions`
+--
+
+INSERT INTO `submissions` (`id`, `user_id`, `problem_id`, `contest_id`, `language_id`, `source_code`, `stdin`, `status`, `score`, `execution_time_ms`, `memory_kb`, `judge0_token`, `verdict_details`, `plagiarism_flag`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 1, 2, 'print(sum(map(int,input().split())))', '2 3', 'Accepted', 100, 10, 12000, 'tok_abc', '{\"message\": \"OK\"}', 0, '2025-08-20 08:15:00', '2025-08-16 17:56:05'),
+(2, 3, 2, 1, 2, 'print(\"YES\")\n', '([)]', 'Wrong Answer', 0, 5, 8000, 'tok_def', '{\"message\": \"WA\"}', 0, '2025-08-20 08:25:00', '2025-08-16 17:56:05'),
+(3, 4, 2, 1, 2, '# stack solution...', '([]){}', 'Accepted', 200, 25, 15000, 'tok_ghi', '{\"message\": \"OK\"}', 0, '2025-08-20 08:40:00', '2025-08-16 17:56:05'),
+(4, 2, 2, 1, 2, '# proper stack\n', '(((())))', 'Accepted', 200, 30, 14000, 'tok_jkl', '{\"message\": \"OK\"}', 0, '2025-08-20 09:05:00', '2025-08-16 17:56:05'),
+(5, 5, 3, NULL, 1, '// BFS code...', '5 5\n1 2\n2 3\n1 4\n4 5\n5 3', 'Accepted', 300, 120, 256000, 'tok_mno', '{\"message\": \"OK\"}', 0, '2025-08-19 05:00:00', '2025-08-16 17:56:05');
+
 -- --------------------------------------------------------
 
 --
@@ -399,6 +595,16 @@ CREATE TABLE `submission_case_results` (
   `stderr` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `submission_case_results`
+--
+
+INSERT INTO `submission_case_results` (`id`, `submission_id`, `test_case_id`, `status`, `execution_time_ms`, `memory_kb`, `stdout`, `stderr`) VALUES
+(1, 1, 1, 'Accepted', 10, 12000, '5', ''),
+(2, 1, 2, 'Accepted', 9, 11000, '350', ''),
+(3, 2, 4, 'Wrong Answer', 5, 8000, 'YES', ''),
+(4, 3, 4, 'Accepted', 20, 15000, 'YES', '');
+
 -- --------------------------------------------------------
 
 --
@@ -409,6 +615,34 @@ CREATE TABLE `tags` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tags`
+--
+
+INSERT INTO `tags` (`id`, `name`) VALUES
+(6, 'Array'),
+(21, 'Backtracking'),
+(12, 'Binary Search'),
+(22, 'Bit Manipulation'),
+(1, 'dp'),
+(9, 'Dynamic Programming'),
+(24, 'Geometry'),
+(14, 'Graph'),
+(2, 'graphs'),
+(5, 'Greedy'),
+(18, 'Hash Table'),
+(19, 'Linked List'),
+(4, 'Math'),
+(17, 'Queue'),
+(20, 'Recursion'),
+(23, 'Simulation'),
+(13, 'Sorting'),
+(16, 'Stack'),
+(7, 'String'),
+(3, 'strings'),
+(15, 'Tree'),
+(11, 'Two Pointers');
 
 -- --------------------------------------------------------
 
@@ -426,6 +660,21 @@ CREATE TABLE `test_cases` (
   `score_weight` int(11) NOT NULL DEFAULT 1,
   `visibility` enum('hidden','sample') NOT NULL DEFAULT 'hidden'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `test_cases`
+--
+
+INSERT INTO `test_cases` (`id`, `problem_id`, `case_order`, `input_data`, `expected_output`, `is_sample`, `score_weight`, `visibility`) VALUES
+(1, 1, 1, '2 3', '5', 1, 1, 'sample'),
+(2, 1, 2, '100 250', '350', 0, 1, 'hidden'),
+(3, 1, 3, '-7 4', '-3', 0, 1, 'hidden'),
+(4, 2, 1, '([]){}', 'YES', 1, 1, 'sample'),
+(5, 2, 2, '([)]', 'NO', 1, 1, 'sample'),
+(6, 2, 3, '(((())))', 'YES', 0, 1, 'hidden'),
+(7, 3, 1, '4 3\n1 2\n2 3\n3 4', '3', 1, 1, 'sample'),
+(8, 3, 2, '3 1\n1 2', '-1', 0, 1, 'hidden'),
+(9, 3, 3, '5 5\n1 2\n2 3\n1 4\n4 5\n5 3', '2', 0, 1, 'hidden');
 
 -- --------------------------------------------------------
 
@@ -446,6 +695,51 @@ CREATE TABLE `users` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `rating`, `rank_label`, `avatar_url`, `created_at`, `updated_at`) VALUES
+(1, 'alice_admin', 'alice@example.com', '$2b$10$CwTycUXWue0Thq9StjUM0uJ8h2dZQpime5FRCGDpa2BkLomqKgP/6', 'admin', 1500, 'Tech Lieutenant', NULL, '2025-08-16 17:56:05', '2025-08-16 17:56:05'),
+(2, 'bob', 'bob@example.com', '$2b$10$CwTycUXWue0Thq9StjUM0uJ8h2dZQpime5FRCGDpa2BkLomqKgP/6', 'user', 900, 'Private Recruit', NULL, '2025-08-16 17:56:05', '2025-08-16 17:56:05'),
+(3, 'charlie', 'charlie@example.com', '$2b$10$CwTycUXWue0Thq9StjUM0uJ8h2dZQpime5FRCGDpa2BkLomqKgP/6', 'user', 1100, 'Cadet Coder', NULL, '2025-08-16 17:56:05', '2025-08-16 17:56:05'),
+(4, 'diana', 'diana@example.com', '$2b$10$CwTycUXWue0Thq9StjUM0uJ8h2dZQpime5FRCGDpa2BkLomqKgP/6', 'user', 1250, 'Code Corporal', NULL, '2025-08-16 17:56:05', '2025-08-16 17:56:05'),
+(5, 'eren', 'eren@example.com', '$2b$10$CwTycUXWue0Thq9StjUM0uJ8h2dZQpime5FRCGDpa2BkLomqKgP/6', 'user', 1400, 'Tech Lieutenant', NULL, '2025-08-16 17:56:05', '2025-08-16 17:56:05'),
+(7, 'qwerty', 'qwerty@gmail.com', '$2b$12$3AmJf2Qzow8Ya.v/OSO9eeGJSr8qIjDqT1usi8EXbEl80KNVWsKAW', 'user', 1728, 'Tech Lieutenant', 'https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?fm=jpg.jpg', '2025-08-22 04:49:54', '2025-09-21 03:42:11'),
+(8, 'qwertyu', 'qwertyu@gmail.com', '$2b$12$TA84qlSe87lbQGNrRaxMK.h1r0K3YRrS6PQcYhMgm/SRk7l9bHznm', 'user', 800, 'Private Recruit', NULL, '2025-08-22 17:58:22', '2025-08-22 17:58:22'),
+(9, 'qwertyu12', 'qwertyu22@gmail.com', '$2b$12$UTy3AwDgpX9D9vUuDHpwoO/SYQ1/QyPUcAqUSjtaKvyHU9Oy/S7rq', 'user', 800, 'Private Recruit', NULL, '2025-08-22 17:59:53', '2025-08-22 17:59:53'),
+(11, 'CodeMaster_2025', 'codemaster@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 2100, 'Legendary General', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(12, 'AlgoNinja', 'algoninja@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 2050, 'Legendary General', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(13, 'DevWarrior', 'devwarrior@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1950, 'Algorithm Captain', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(14, 'ByteBeast', 'bytebeast@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1900, 'Algorithm Captain', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(15, 'CodingAce', 'codingace@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1875, 'Algorithm Captain', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(16, 'techguru123', 'techguru@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1860, 'Algorithm Captain', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(17, 'programmerpro', 'programmerpro@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1840, 'Algorithm Captain', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(18, 'ScriptSage', 'scriptsage@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1820, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(19, 'LogicLord', 'logiclord@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1800, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(20, 'DataDriven', 'datadriven@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1780, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(21, 'CodeCrusher', 'codecrusher@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1750, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(22, 'AlgoExpert', 'algoexpert@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1720, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(23, 'PythonPro', 'pythonpro@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1680, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(24, 'JavaJedi', 'javajedi@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1650, 'Tech Lieutenant', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(25, 'CppChampion', 'cppchampion@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1600, 'Code Corporal', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(26, 'JSWizard', 'jswizard@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1550, 'Code Corporal', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(27, 'WebDev101', 'webdev101@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1500, 'Code Corporal', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(28, 'newbie_coder', 'newbie@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1200, 'Code Corporal', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(29, 'learning_fast', 'learning@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 1000, 'Cadet Coder', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(30, 'beginner_dev', 'beginner@example.com', '$2b$10$qiWZ6Io6Kd/2watpjl3CXOlUTce2MfQHzMHKcsb5FiIOdp0H7YIb2', 'user', 850, 'Private Recruit', '/images/default-avatar.svg', '2025-08-23 14:27:52', '2025-08-23 14:27:52'),
+(31, 'alice_coder', 'alice@test.com', 'test_password', 'user', 1200, 'Code Corporal', NULL, '2025-08-23 16:10:15', '2025-08-23 16:10:15'),
+(32, 'bob_solver', 'bob@test.com', 'test_password', 'user', 950, 'Cadet Coder', NULL, '2025-08-23 16:10:15', '2025-08-23 16:10:15'),
+(33, 'charlie_dev', 'charlie@test.com', 'test_password', 'user', 1500, 'Tech Lieutenant', NULL, '2025-08-23 16:10:15', '2025-08-23 16:10:15'),
+(34, 'diana_algo', 'diana@test.com', 'test_password', 'user', 1800, 'Algorithm Captain', NULL, '2025-08-23 16:10:15', '2025-08-23 16:10:15'),
+(35, 'eve_master', 'eve@test.com', 'test_password', 'user', 2100, 'Legendary General', NULL, '2025-08-23 16:10:15', '2025-08-23 16:10:15'),
+(41, 'staruser1', 'star1@example.com', 'hashedpassword', 'user', 2100, 'Legendary General', NULL, '2025-08-23 16:21:17', '2025-08-23 16:21:17'),
+(42, 'staruser2', 'star2@example.com', 'hashedpassword', 'user', 1850, 'Algorithm Captain', NULL, '2025-08-23 16:21:17', '2025-08-23 16:21:17'),
+(43, 'staruser3', 'star3@example.com', 'hashedpassword', 'user', 1600, 'Tech Lieutenant', NULL, '2025-08-23 16:21:17', '2025-08-23 16:21:17'),
+(44, 'staruser4', 'star4@example.com', 'hashedpassword', 'user', 1200, 'Cadet Coder', NULL, '2025-08-23 16:21:17', '2025-08-23 16:21:17'),
+(45, 'staruser5', 'star5@example.com', 'hashedpassword', 'user', 950, 'Private Recruit', NULL, '2025-08-23 16:21:17', '2025-08-23 16:21:17'),
+(46, 'admin', 'admin@brainjam.com', '$2b$12$G4ZD1h.7kPyP5apSwGRmFO/myFrHA8SPK8TWancI0blqILurCuyGy', 'admin', 800, 'Private Recruit', NULL, '2025-09-20 13:22:58', '2025-09-20 13:23:38');
+
 -- --------------------------------------------------------
 
 --
@@ -457,6 +751,13 @@ CREATE TABLE `user_badges` (
   `badge_id` int(11) NOT NULL,
   `earned_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_badges`
+--
+
+INSERT INTO `user_badges` (`user_id`, `badge_id`, `earned_at`) VALUES
+(2, 1, '2025-08-16 17:56:05');
 
 -- --------------------------------------------------------
 
@@ -472,6 +773,46 @@ CREATE TABLE `user_stats` (
   `streak_days` int(11) NOT NULL DEFAULT 0,
   `last_active_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_stats`
+--
+
+INSERT INTO `user_stats` (`user_id`, `solved_count`, `contest_count`, `win_count`, `streak_days`, `last_active_at`) VALUES
+(1, 200, 10, 3, 5, NULL),
+(2, 5, 1, 0, 1, NULL),
+(3, 20, 3, 1, 2, NULL),
+(4, 35, 4, 1, 0, NULL),
+(5, 60, 7, 2, 6, NULL),
+(7, 0, 0, 0, 0, NULL),
+(8, 0, 0, 0, 0, NULL),
+(9, 0, 0, 0, 0, NULL),
+(11, 210, 10, 7, 7, '2025-08-23 20:27:52'),
+(12, 205, 10, 6, 22, '2025-08-23 20:27:52'),
+(13, 195, 9, 6, 0, '2025-08-23 20:27:52'),
+(14, 190, 9, 6, 20, '2025-08-23 20:27:52'),
+(15, 187, 9, 6, 2, '2025-08-23 20:27:52'),
+(16, 186, 9, 6, 0, '2025-08-23 20:27:52'),
+(17, 184, 9, 6, 16, '2025-08-23 20:27:52'),
+(18, 182, 9, 6, 27, '2025-08-23 20:27:52'),
+(19, 180, 9, 6, 28, '2025-08-23 20:27:52'),
+(20, 178, 8, 5, 25, '2025-08-23 20:27:52'),
+(21, 175, 8, 5, 28, '2025-08-23 20:27:52'),
+(22, 172, 8, 5, 12, '2025-08-23 20:27:52'),
+(23, 168, 8, 5, 13, '2025-08-23 20:27:52'),
+(24, 165, 8, 5, 13, '2025-08-23 20:27:52'),
+(25, 160, 8, 5, 16, '2025-08-23 20:27:52'),
+(26, 155, 7, 5, 20, '2025-08-23 20:27:52'),
+(27, 150, 7, 5, 23, '2025-08-23 20:27:52'),
+(28, 120, 6, 4, 28, '2025-08-23 20:27:52'),
+(29, 100, 5, 3, 10, '2025-08-23 20:27:52'),
+(30, 85, 4, 2, 9, '2025-08-23 20:27:52'),
+(31, 58, 3, 3, 6, NULL),
+(32, 42, 10, 0, 4, NULL),
+(33, 59, 3, 1, 19, NULL),
+(34, 19, 7, 1, 16, NULL),
+(35, 39, 2, 2, 21, NULL),
+(46, 0, 0, 0, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -710,37 +1051,37 @@ ALTER TABLE `user_stats`
 -- AUTO_INCREMENT for table `badges`
 --
 ALTER TABLE `badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `contests`
 --
 ALTER TABLE `contests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `daily_suggestions`
 --
 ALTER TABLE `daily_suggestions`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `languages`
 --
 ALTER TABLE `languages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `learning_categories`
 --
 ALTER TABLE `learning_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `learning_resources`
 --
 ALTER TABLE `learning_resources`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `learning_resource_votes`
@@ -752,73 +1093,73 @@ ALTER TABLE `learning_resource_votes`
 -- AUTO_INCREMENT for table `plagiarism_findings`
 --
 ALTER TABLE `plagiarism_findings`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `post_reactions`
 --
 ALTER TABLE `post_reactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `practice_runs`
 --
 ALTER TABLE `practice_runs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `problems`
 --
 ALTER TABLE `problems`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `problem_examples`
 --
 ALTER TABLE `problem_examples`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `rating_history`
 --
 ALTER TABLE `rating_history`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=198;
 
 --
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
 
 --
 -- AUTO_INCREMENT for table `submission_case_results`
 --
 ALTER TABLE `submission_case_results`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `test_cases`
 --
 ALTER TABLE `test_cases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- Constraints for dumped tables

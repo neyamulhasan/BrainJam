@@ -6,14 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const userData = localStorage.getItem('user');
         
         if (!token || !userData) {
-            window.location.href = '/login.html';
+            window.location.href = 'login.html';
             return false;
         }
         
         const user = JSON.parse(userData);
         
         if (user.role !== 'admin') {
-            window.location.href = '/dashboard.html';
+            window.location.href = 'dashboard.html';
             return false;
         }
         
