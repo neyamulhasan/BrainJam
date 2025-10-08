@@ -1,0 +1,78 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Animations for elements */
+.problem-card {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.error-message, .message.error {
+    animation: shake 0.5s ease-in-out;
+}
+
+.tag, .btn, .action-btn {
+    transition: all 0.2s ease;
+}
+
+.tag:hover, .btn:hover, .action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Loading animation */
+.loading-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+
+.loading-indicator i {
+    font-size: 2rem;
+    color: var(--accent-blue);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spin {
+    animation: spin 1s linear infinite;
+}
