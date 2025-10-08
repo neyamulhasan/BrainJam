@@ -6,6 +6,8 @@
     <title>Admin Dashboard - BrainJam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-buttons.css">
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
     <div class="admin-container">
@@ -26,7 +28,7 @@
                     <i class="fas fa-trophy"></i>
                     <span>Competition Management</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="problem-management.html" class="nav-item">
                     <i class="fas fa-code"></i>
                     <span>Problem Management</span>
                 </a>
@@ -35,7 +37,14 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <h1>Dashboard</h1>
+            <header class="admin-header">
+                <h1><i class="fas fa-home"></i> Dashboard</h1>
+                <div class="header-actions">
+                    <button id="logout-btn" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </header>
 
             <!-- Stats Cards -->
             <div class="stats-container">
@@ -110,5 +119,6 @@
     </div>
 
     <script src="js/admin.js"></script>
+    <script src="js/admin-auth.js"></script>
 </body>
 </html>
