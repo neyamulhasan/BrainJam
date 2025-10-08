@@ -10,7 +10,8 @@ const geekFeedRoutes = require('./routes/geek_feed');
 const adminRoutes = require('./routes/admin');
 const learningRoutes = require('./routes/learning');
 const learnRoutes = require('./routes/learn');
-const practiceRoutes = require('./routes/practice');//
+const practiceRoutes = require('./routes/practice');
+const problemsRoutes = require('./routes/problems');
 
 const db = require('./config/database');
 
@@ -66,7 +67,8 @@ app.use('/api/geek-feed', geekFeedRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/learning', learningRoutes);
 app.use('/api/learn', learnRoutes);
-app.use('/api/practice', practiceRoutes);//
+app.use('/api/practice', practiceRoutes);
+app.use('/api/problems', problemsRoutes);
 
 
 // Serve HTML pages
@@ -115,6 +117,10 @@ app.get('/practice', (req, res) => {
 
 app.get('/problem-detail', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'problem-detail.html'));
+});
+
+app.get('/problem-management', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'problem-management.html'));
 });
 
 // Error handling middleware
