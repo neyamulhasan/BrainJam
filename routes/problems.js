@@ -5,10 +5,9 @@ const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Temporarily bypass authentication for debugging
-// router.use(authenticateToken);
-// router.use(isAdmin);
-console.log('WARNING: Authentication temporarily disabled for debugging');
+// Enable authentication and admin check
+router.use(authenticateToken);
+router.use(isAdmin);
 
 /**
  * Test route to verify database connection
@@ -37,12 +36,9 @@ router.get('/test', async (req, res) => {
  */
 router.get('/', async (req, res) => {
     try {
-        console.log('GET /api/problems - Starting to fetch all problems');
-        
         // First check if we can execute a simple query
         try {
             const [testResult] = await db.execute('SELECT 1 as test');
-            console.log('Database connection test successful:', testResult);
         } catch (dbError) {
             console.error('Database connection test failed:', dbError);
             return res.status(500).json({ 
@@ -52,7 +48,6 @@ router.get('/', async (req, res) => {
         }
         
         // Fetch all problems
-        console.log('Executing SQL query for problems...');
         const [problems] = await db.execute(`
             SELECT 
                 p.id, p.title, p.body_md as description, p.difficulty, 
@@ -61,10 +56,8 @@ router.get('/', async (req, res) => {
             FROM problems p
             ORDER BY p.created_at DESC
         `);
-        console.log(`Found ${problems.length} problems in database`);
 
         // Get tags for each problem
-        console.log('Starting to fetch tags for each problem...');
         for (const problem of problems) {
             const [tags] = await db.execute(`
                 SELECT t.id, t.name
@@ -74,10 +67,8 @@ router.get('/', async (req, res) => {
             `, [problem.id]);
             
             problem.tags = tags;
-            console.log(`Found ${tags.length} tags for problem ${problem.id}`);
             
             // Get count of test cases
-            console.log(`Fetching test case count for problem ${problem.id}...`);
             const [testCasesCount] = await db.execute(`
                 SELECT COUNT(*) as count
                 FROM problem_examples
@@ -85,10 +76,8 @@ router.get('/', async (req, res) => {
             `, [problem.id]);
             
             problem.test_cases_count = testCasesCount[0].count;
-            console.log(`Problem ${problem.id} has ${problem.test_cases_count} test cases`);
         }
 
-        console.log('Successfully processed all problems, sending response');
         res.json({
             success: true,
             data: problems
@@ -108,6 +97,33 @@ router.get('/', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to fetch problems: ' + error.message
+        });
+    }
+});
+
+/**
+ * GET /api/problems/tags
+ * Get all problem tags (admin access)
+ */
+router.get('/tags', async (req, res) => {
+    try {
+        // Fetch all tags
+        const [tags] = await db.execute(`
+            SELECT id, name
+            FROM tags
+            ORDER BY name ASC
+        `);
+
+        res.json({
+            success: true,
+            data: tags
+        });
+
+    } catch (error) {
+        console.error('Error fetching problem tags:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch problem tags'
         });
     }
 });
@@ -134,8 +150,9 @@ router.get('/:id', [
         // Fetch problem details
         const [problems] = await db.execute(`
             SELECT 
-                p.id, p.title, p.description, p.difficulty, 
-                p.time_limit, p.memory_limit, p.created_at, p.updated_at
+                p.id, p.title, p.body_md as description, p.difficulty, 
+                p.time_limit_ms as time_limit, p.memory_limit_kb as memory_limit, 
+                p.created_at, p.created_at as updated_at
             FROM problems p
             WHERE p.id = ?
         `, [problemId]);
@@ -151,20 +168,20 @@ router.get('/:id', [
 
         // Get tags for the problem
         const [tags] = await db.execute(`
-            SELECT pt.id, pt.name
-            FROM problem_tags pt
-            JOIN problem_tag_mapping ptm ON pt.id = ptm.tag_id
-            WHERE ptm.problem_id = ?
+            SELECT t.id, t.name
+            FROM tags t
+            JOIN problem_tags pt ON t.id = pt.tag_id
+            WHERE pt.problem_id = ?
         `, [problemId]);
         
         problem.tags = tags;
 
         // Get test cases for the problem
         const [testCases] = await db.execute(`
-            SELECT id, input_text as input, output_text as output, is_hidden, is_example
+            SELECT id, input_text as input, output_text as output, example_order
             FROM problem_examples
             WHERE problem_id = ?
-            ORDER BY id ASC
+            ORDER BY example_order ASC
         `, [problemId]);
         
         problem.test_cases = testCases;
@@ -176,9 +193,17 @@ router.get('/:id', [
 
     } catch (error) {
         console.error('Error fetching problem details:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            sqlState: error.sqlState,
+            sql: error.sql
+        });
         res.status(500).json({
             success: false,
-            error: 'Failed to fetch problem details'
+            error: 'Failed to fetch problem details: ' + error.message
         });
     }
 });
@@ -194,10 +219,10 @@ router.post('/', [
         .withMessage('Description is required'),
     body('difficulty').isIn(['easy', 'medium', 'hard'])
         .withMessage('Difficulty must be easy, medium, or hard'),
-    body('time_limit').isFloat({ min: 0.1, max: 10 })
-        .withMessage('Time limit must be between 0.1 and 10 seconds'),
-    body('memory_limit').isInt({ min: 1, max: 512 })
-        .withMessage('Memory limit must be between 1 and 512 MB'),
+    body('time_limit').isInt({ min: 100, max: 10000 })
+        .withMessage('Time limit must be between 100 and 10000 milliseconds'),
+    body('memory_limit').isInt({ min: 1024, max: 524288 })
+        .withMessage('Memory limit must be between 1024 and 524288 KB'),
     body('tags').isArray()
         .withMessage('Tags must be an array'),
     body('test_cases').isArray({ min: 1 })
@@ -206,8 +231,8 @@ router.post('/', [
         .withMessage('Test case input is required'),
     body('test_cases.*.output').isString().notEmpty()
         .withMessage('Test case output is required'),
-    body('test_cases.*.is_hidden').isBoolean()
-        .withMessage('is_hidden must be a boolean')
+    body('test_cases.*.is_hidden').optional().isBoolean()
+        .withMessage('is_hidden must be a boolean if provided')
 ], async (req, res) => {
     try {
         // Validate input
@@ -226,11 +251,37 @@ router.post('/', [
         await connection.beginTransaction();
 
         try {
+            // Create slug from title
+            let baseSlug = title.toLowerCase()
+                .replace(/[^\w\s-]/g, '')  // Remove special chars
+                .replace(/\s+/g, '-')      // Replace spaces with hyphens
+                .substring(0, 50);          // Shorter to allow for uniqueness suffix
+                
+            // Check if slug exists and make it unique if needed
+            let slug = baseSlug;
+            let counter = 1;
+            let slugExists = true;
+            
+            while (slugExists) {
+                // Check if this slug already exists
+                const [existingSlugs] = await connection.execute(`
+                    SELECT id FROM problems WHERE slug = ?
+                `, [slug]);
+                
+                if (existingSlugs.length === 0) {
+                    slugExists = false;
+                } else {
+                    // Add a counter to make slug unique
+                    slug = `${baseSlug}-${counter}`;
+                    counter++;
+                }
+            }
+
             // Create problem
             const [result] = await connection.execute(`
-                INSERT INTO problems (title, description, difficulty, time_limit, memory_limit)
-                VALUES (?, ?, ?, ?, ?)
-            `, [title, description, difficulty, time_limit, memory_limit]);
+                INSERT INTO problems (title, body_md, difficulty, time_limit_ms, memory_limit_kb, slug)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `, [title, description, difficulty, time_limit, memory_limit, slug]);
 
             const problemId = result.insertId;
 
@@ -238,7 +289,7 @@ router.post('/', [
             for (const tagName of tags) {
                 // Check if tag exists
                 const [existingTags] = await connection.execute(`
-                    SELECT id FROM problem_tags WHERE name = ?
+                    SELECT id FROM tags WHERE name = ?
                 `, [tagName]);
 
                 let tagId;
@@ -249,7 +300,7 @@ router.post('/', [
                 } else {
                     // Create new tag
                     const [newTag] = await connection.execute(`
-                        INSERT INTO problem_tags (name) VALUES (?)
+                        INSERT INTO tags (name) VALUES (?)
                     `, [tagName]);
                     
                     tagId = newTag.insertId;
@@ -257,19 +308,19 @@ router.post('/', [
 
                 // Create mapping
                 await connection.execute(`
-                    INSERT INTO problem_tag_mapping (problem_id, tag_id)
+                    INSERT INTO problem_tags (problem_id, tag_id)
                     VALUES (?, ?)
                 `, [problemId, tagId]);
             }
 
             // Process test cases
-            for (const testCase of test_cases) {
-                const isExample = !testCase.is_hidden;
+            for (let i = 0; i < test_cases.length; i++) {
+                const testCase = test_cases[i];
                 
                 await connection.execute(`
-                    INSERT INTO problem_examples (problem_id, input_text, output_text, is_hidden, is_example)
+                    INSERT INTO problem_examples (problem_id, input_text, output_text, example_order, explanation)
                     VALUES (?, ?, ?, ?, ?)
-                `, [problemId, testCase.input, testCase.output, testCase.is_hidden, isExample]);
+                `, [problemId, testCase.input, testCase.output, i+1, null]);
             }
 
             // Commit transaction
@@ -291,9 +342,17 @@ router.post('/', [
 
     } catch (error) {
         console.error('Error creating problem:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            sqlState: error.sqlState,
+            sql: error.sql
+        });
         res.status(500).json({
             success: false,
-            error: 'Failed to create problem'
+            error: 'Failed to create problem: ' + error.message
         });
     }
 });
@@ -310,10 +369,10 @@ router.put('/:id', [
         .withMessage('Description is required'),
     body('difficulty').isIn(['easy', 'medium', 'hard'])
         .withMessage('Difficulty must be easy, medium, or hard'),
-    body('time_limit').isFloat({ min: 0.1, max: 10 })
-        .withMessage('Time limit must be between 0.1 and 10 seconds'),
-    body('memory_limit').isInt({ min: 1, max: 512 })
-        .withMessage('Memory limit must be between 1 and 512 MB'),
+    body('time_limit').isInt({ min: 100, max: 10000 })
+        .withMessage('Time limit must be between 100 and 10000 milliseconds'),
+    body('memory_limit').isInt({ min: 1024, max: 524288 })
+        .withMessage('Memory limit must be between 1024 and 524288 KB'),
     body('tags').isArray()
         .withMessage('Tags must be an array'),
     body('test_cases').isArray({ min: 1 })
@@ -322,8 +381,8 @@ router.put('/:id', [
         .withMessage('Test case input is required'),
     body('test_cases.*.output').isString().notEmpty()
         .withMessage('Test case output is required'),
-    body('test_cases.*.is_hidden').isBoolean()
-        .withMessage('is_hidden must be a boolean')
+    body('test_cases.*.is_hidden').optional().isBoolean()
+        .withMessage('is_hidden must be a boolean if provided')
 ], async (req, res) => {
     try {
         // Validate input
@@ -355,16 +414,59 @@ router.put('/:id', [
         await connection.beginTransaction();
 
         try {
+            // Create or update slug from title
+            let baseSlug = title.toLowerCase()
+                .replace(/[^\w\s-]/g, '')  // Remove special chars
+                .replace(/\s+/g, '-')      // Replace spaces with hyphens
+                .substring(0, 50);          // Shorter to allow for uniqueness suffix
+            
+            // Get current problem to check if title changed
+            const [currentProblem] = await connection.execute(`
+                SELECT slug FROM problems WHERE id = ?
+            `, [problemId]);
+            
+            let slug;
+            
+            if (currentProblem.length > 0) {
+                // If title hasn't changed much, keep the existing slug
+                const currentSlug = currentProblem[0].slug;
+                if (currentSlug.startsWith(baseSlug) || baseSlug.startsWith(currentSlug.split('-')[0])) {
+                    slug = currentSlug;
+                } else {
+                    // Title changed significantly, create new unique slug
+                    slug = baseSlug;
+                    let counter = 1;
+                    let slugExists = true;
+                    
+                    while (slugExists) {
+                        // Check if this slug already exists (excluding current problem)
+                        const [existingSlugs] = await connection.execute(`
+                            SELECT id FROM problems WHERE slug = ? AND id != ?
+                        `, [slug, problemId]);
+                        
+                        if (existingSlugs.length === 0) {
+                            slugExists = false;
+                        } else {
+                            // Add a counter to make slug unique
+                            slug = `${baseSlug}-${counter}`;
+                            counter++;
+                        }
+                    }
+                }
+            } else {
+                slug = baseSlug; // Fallback, should not happen
+            }
+            
             // Update problem
             await connection.execute(`
                 UPDATE problems
-                SET title = ?, description = ?, difficulty = ?, time_limit = ?, memory_limit = ?, updated_at = NOW()
+                SET title = ?, body_md = ?, difficulty = ?, time_limit_ms = ?, memory_limit_kb = ?, slug = ?
                 WHERE id = ?
-            `, [title, description, difficulty, time_limit, memory_limit, problemId]);
+            `, [title, description, difficulty, time_limit, memory_limit, slug, problemId]);
 
             // Delete existing tag mappings
             await connection.execute(`
-                DELETE FROM problem_tag_mapping
+                DELETE FROM problem_tags
                 WHERE problem_id = ?
             `, [problemId]);
 
@@ -372,7 +474,7 @@ router.put('/:id', [
             for (const tagName of tags) {
                 // Check if tag exists
                 const [existingTags] = await connection.execute(`
-                    SELECT id FROM problem_tags WHERE name = ?
+                    SELECT id FROM tags WHERE name = ?
                 `, [tagName]);
 
                 let tagId;
@@ -383,7 +485,7 @@ router.put('/:id', [
                 } else {
                     // Create new tag
                     const [newTag] = await connection.execute(`
-                        INSERT INTO problem_tags (name) VALUES (?)
+                        INSERT INTO tags (name) VALUES (?)
                     `, [tagName]);
                     
                     tagId = newTag.insertId;
@@ -391,7 +493,7 @@ router.put('/:id', [
 
                 // Create mapping
                 await connection.execute(`
-                    INSERT INTO problem_tag_mapping (problem_id, tag_id)
+                    INSERT INTO problem_tags (problem_id, tag_id)
                     VALUES (?, ?)
                 `, [problemId, tagId]);
             }
@@ -416,22 +518,22 @@ router.put('/:id', [
             }
 
             // Update or create test cases
-            for (const testCase of test_cases) {
-                const isExample = !testCase.is_hidden;
+            for (let i = 0; i < test_cases.length; i++) {
+                const testCase = test_cases[i];
                 
                 if (testCase.id) {
                     // Update existing test case
                     await connection.execute(`
                         UPDATE problem_examples
-                        SET input_text = ?, output_text = ?, is_hidden = ?, is_example = ?
+                        SET input_text = ?, output_text = ?, example_order = ?
                         WHERE id = ? AND problem_id = ?
-                    `, [testCase.input, testCase.output, testCase.is_hidden, isExample, testCase.id, problemId]);
+                    `, [testCase.input, testCase.output, i+1, testCase.id, problemId]);
                 } else {
                     // Create new test case
                     await connection.execute(`
-                        INSERT INTO problem_examples (problem_id, input_text, output_text, is_hidden, is_example)
+                        INSERT INTO problem_examples (problem_id, input_text, output_text, example_order, explanation)
                         VALUES (?, ?, ?, ?, ?)
-                    `, [problemId, testCase.input, testCase.output, testCase.is_hidden, isExample]);
+                    `, [problemId, testCase.input, testCase.output, i+1, null]);
                 }
             }
 
@@ -454,9 +556,17 @@ router.put('/:id', [
 
     } catch (error) {
         console.error('Error updating problem:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            sqlState: error.sqlState,
+            sql: error.sql
+        });
         res.status(500).json({
             success: false,
-            error: 'Failed to update problem'
+            error: 'Failed to update problem: ' + error.message
         });
     }
 });
@@ -505,7 +615,7 @@ router.delete('/:id', [
 
             // Delete tag mappings
             await connection.execute(`
-                DELETE FROM problem_tag_mapping
+                DELETE FROM problem_tags
                 WHERE problem_id = ?
             `, [problemId]);
 
@@ -546,31 +656,6 @@ router.delete('/:id', [
     }
 });
 
-/**
- * GET /api/problems/tags
- * Get all problem tags (admin access)
- */
-router.get('/tags', async (req, res) => {
-    try {
-        // Fetch all tags
-        const [tags] = await db.execute(`
-            SELECT id, name
-            FROM tags
-            ORDER BY name ASC
-        `);
 
-        res.json({
-            success: true,
-            data: tags
-        });
-
-    } catch (error) {
-        console.error('Error fetching problem tags:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch problem tags'
-        });
-    }
-});
 
 module.exports = router;
