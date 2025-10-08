@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', function() {
     problemForm.addEventListener('submit', saveProblem);
     addTestCaseBtn.addEventListener('click', addTestCaseForm);
     addTagBtn.addEventListener('click', addTag);
+    
+    // Add event listener for Enter key on tag input
+    addTagInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag();
+        }
+    });
 
     // Close modals when clicking on X or outside modal
     document.querySelectorAll('.close-modal').forEach(button => {
@@ -153,8 +161,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             
             if (result.success) {
-                problemTags = result.data;
-                populateTagsFilter(problemTags);
+                // Load available tags for the dropdown filter
+                const availableTags = result.data;
+                populateTagsFilter(availableTags);
             }
         } catch (error) {
             console.error('Error loading tags:', error);
@@ -196,16 +205,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${problem.tags && problem.tags.length ? problem.tags.map(tag => `<span class="tag">${tag.name}</span>`).join('') : '<span class="no-tags">No tags</span>'}
                     </div>
                     <div class="problem-stats">
-                        <span><i class="fas fa-stopwatch"></i> ${problem.time_limit}ms</span>
+                        <span><i class="fas fa-stopwatch"></i> ${(problem.time_limit / 1000).toFixed(1)}s</span>
                         <span><i class="fas fa-memory"></i> ${Math.round(problem.memory_limit / 1024)}MB</span>
                         <span><i class="fas fa-vial"></i> ${problem.test_cases_count || 0} test cases</span>
                     </div>
                     <div class="action-buttons">
                         <button class="action-btn edit-btn edit-problem" data-id="${problem.id}" title="Edit Problem">
                             <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn view-btn view-problem" data-id="${problem.id}" title="View Problem">
-                            <i class="fas fa-eye"></i>
                         </button>
                         <button class="action-btn delete-btn delete-problem" data-id="${problem.id}" title="Delete Problem">
                             <i class="fas fa-trash-alt"></i>
@@ -222,13 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function() {
                 const problemId = this.getAttribute('data-id');
                 editProblem(problemId);
-            });
-        });
-        
-        document.querySelectorAll('.view-problem').forEach(button => {
-            button.addEventListener('click', function() {
-                const problemId = this.getAttribute('data-id');
-                viewProblem(problemId);
             });
         });
         
@@ -293,7 +292,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
+            console.log('Edit problem response status:', response.status);
             const result = await response.json();
+            console.log('Edit problem result:', result);
             
             if (result.success) {
                 currentProblem = result.data;
@@ -301,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modalTitle.textContent = 'Edit Problem';
                 openModal(problemModal);
             } else {
+                console.error('Failed to load problem details:', result);
                 showAlert('Error', result.error || 'Failed to load problem details');
             }
         } catch (error) {
@@ -309,11 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // View problem details
-    function viewProblem(problemId) {
-        // Redirect to problem view page
-        window.location.href = `/problem.html?id=${problemId}`;
-    }
+    // This function was replaced by editProblem
+    // View functionality has been removed
 
     // Fill form with problem data
     function fillProblemForm(problem) {
@@ -321,8 +320,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('title').value = problem.title;
         document.getElementById('difficulty').value = problem.difficulty.toLowerCase();
         document.getElementById('description').value = problem.description;
-        document.getElementById('timeLimit').value = problem.time_limit;
-        document.getElementById('memoryLimit').value = problem.memory_limit;
+        // Convert milliseconds to seconds
+        document.getElementById('timeLimit').value = (problem.time_limit / 1000).toFixed(1);
+        // Convert KB to MB
+        document.getElementById('memoryLimit').value = Math.round(problem.memory_limit / 1024);
         
         // Clear existing test cases and add from problem
         testCasesList.innerHTML = '';
@@ -368,13 +369,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label for="testCaseOutput${testCaseId}"><i class="fas fa-sign-out-alt"></i> Expected Output</label>
                     <textarea id="testCaseOutput${testCaseId}" name="testCaseOutput${testCaseId}" 
                         class="form-input code" placeholder="Enter expected output here...">${testCase ? testCase.output : ''}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="testCaseIsHidden${testCaseId}">
-                        <input type="checkbox" id="testCaseIsHidden${testCaseId}" name="testCaseIsHidden${testCaseId}" 
-                            ${testCase && testCase.is_hidden ? 'checked' : ''}>
-                        Hidden Test Case (not shown to users)
-                    </label>
                 </div>
                 ${testCase ? `<input type="hidden" name="testCaseId${testCaseId}" value="${testCase.id}">` : ''}
             </div>
@@ -434,13 +428,20 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // Collect form data
             const problemId = document.getElementById('problemId').value;
+            
+            // Collect tags from the tag container
+            const tagElements = tagContainer.querySelectorAll('input[name="tags[]"]');
+            const tags = Array.from(tagElements).map(input => input.value);
+            
             const formData = {
                 title: document.getElementById('title').value,
-                difficulty: document.getElementById('difficulty').value,
+                difficulty: document.getElementById('difficulty').value.toLowerCase(),
                 description: document.getElementById('description').value,
-                time_limit: parseFloat(document.getElementById('timeLimit').value),
-                memory_limit: parseInt(document.getElementById('memoryLimit').value),
-                tags: Array.from(document.querySelectorAll('input[name="tags[]"]')).map(input => input.value),
+                // Convert seconds to milliseconds
+                time_limit: Math.round(parseFloat(document.getElementById('timeLimit').value) * 1000),
+                // Convert MB to KB
+                memory_limit: parseInt(document.getElementById('memoryLimit').value) * 1024,
+                tags: tags, // Use the collected tags from the form
                 test_cases: []
             };
             
@@ -451,7 +452,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const inputElement = document.getElementById(`testCaseInput${i}`);
                 const outputElement = document.getElementById(`testCaseOutput${i}`);
-                const isHiddenElement = document.getElementById(`testCaseIsHidden${i}`);
                 const testCaseIdElement = document.querySelector(`input[name="testCaseId${i}"]`);
                 
                 if (!inputElement || !outputElement) continue;
@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const testCase = {
                     input: inputElement.value,
                     output: outputElement.value,
-                    is_hidden: isHiddenElement ? isHiddenElement.checked : false
+                    is_hidden: false // Default value for is_hidden
                 };
                 
                 if (testCaseIdElement) {
@@ -497,6 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = problemId ? `/api/problems/${problemId}` : '/api/problems';
             const method = problemId ? 'PUT' : 'POST';
             
+            console.log('Saving problem with data:', formData);
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -506,13 +507,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(formData)
             });
             
+            console.log('Save problem response status:', response.status);
             const result = await response.json();
+            console.log('Save problem result:', result);
             
             if (result.success) {
                 showAlert('Success', `Problem ${problemId ? 'updated' : 'created'} successfully`);
                 problemModal.style.display = 'none';
                 loadProblems();
             } else {
+                console.error('Failed to save problem:', result);
                 showAlert('Error', result.error || `Failed to ${problemId ? 'update' : 'create'} problem`);
             }
         } catch (error) {
