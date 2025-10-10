@@ -359,9 +359,122 @@ async function submitSolution(code, language) {
 }
 
 function displayTestResults(results) {
-    // This function would display test case results
-    // Implementation depends on your backend test system
-    console.log('Test results:', results);
+    // Create or get test results container
+    let resultsContainer = document.getElementById('test-results-container');
+    
+    if (!resultsContainer) {
+        resultsContainer = document.createElement('div');
+        resultsContainer.id = 'test-results-container';
+        resultsContainer.className = 'test-results-container';
+        
+        // Insert after submission section
+        const submissionSection = document.querySelector('.submission-section');
+        submissionSection.parentNode.insertBefore(resultsContainer, submissionSection.nextSibling);
+    }
+    
+    const { status, message, testResults, executionTime, memoryUsed } = results;
+    
+    // Create results header
+    const headerClass = status === 'passed' ? 'success' : (status === 'no_tests' ? 'warning' : 'error');
+    const headerIcon = status === 'passed' ? 'check-circle' : (status === 'no_tests' ? 'info-circle' : 'times-circle');
+    
+    let resultsHTML = `
+        <div class="test-results-header ${headerClass}">
+            <div class="result-status">
+                <i class="fas fa-${headerIcon}"></i>
+                <h3>Test Results</h3>
+                <span class="status-badge ${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+            </div>
+            <p class="result-message">${message}</p>
+        </div>
+    `;
+    
+    if (testResults && testResults.length > 0) {
+        // Add execution stats
+        resultsHTML += `
+            <div class="execution-stats">
+                <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span>Execution Time: ${executionTime}ms</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-memory"></i>
+                    <span>Memory Used: ${(memoryUsed / 1024).toFixed(2)}KB</span>
+                </div>
+            </div>
+        `;
+        
+        // Add individual test case results
+        resultsHTML += '<div class="test-cases-results">';
+        
+        testResults.forEach((testResult, index) => {
+            const testStatus = testResult.status === 'passed' ? 'passed' : 'failed';
+            const testIcon = testResult.status === 'passed' ? 'check' : 'times';
+            
+            resultsHTML += `
+                <div class="test-case-result ${testStatus}">
+                    <div class="test-case-header">
+                        <span class="test-case-number">
+                            <i class="fas fa-${testIcon}"></i>
+                            Test Case ${index + 1}
+                        </span>
+                        <span class="test-case-status ${testStatus}">${testResult.status.toUpperCase()}</span>
+                    </div>
+                    
+                    <div class="test-case-details">
+                        <div class="test-input">
+                            <strong>Input:</strong>
+                            <pre><code>${escapeHtml(testResult.input)}</code></pre>
+                        </div>
+                        
+                        <div class="test-output-comparison">
+                            <div class="expected-output">
+                                <strong>Expected Output:</strong>
+                                <pre><code>${escapeHtml(testResult.expectedOutput)}</code></pre>
+                            </div>
+                            
+                            <div class="actual-output">
+                                <strong>Your Output:</strong>
+                                <pre><code class="${testStatus}">${escapeHtml(testResult.actualOutput)}</code></pre>
+                            </div>
+                        </div>
+                        
+                        ${testResult.error ? `
+                            <div class="test-error">
+                                <strong>Error:</strong>
+                                <pre><code class="error">${escapeHtml(testResult.error)}</code></pre>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="test-case-stats">
+                            <span><i class="fas fa-clock"></i> ${testResult.executionTime}ms</span>
+                            <span><i class="fas fa-memory"></i> ${(testResult.memoryUsed / 1024).toFixed(2)}KB</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        resultsHTML += '</div>';
+    }
+    
+    resultsContainer.innerHTML = resultsHTML;
+    
+    // Add click handlers for expandable test cases
+    if (testResults && testResults.length > 0) {
+        const testCaseHeaders = resultsContainer.querySelectorAll('.test-case-header');
+        testCaseHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const testCaseResult = this.parentElement;
+                testCaseResult.classList.toggle('expanded');
+            });
+        });
+    }
+    
+    // Scroll to results
+    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    console.log('Test results displayed:', results);
 }
 
 function showMessage(message, type = 'info') {
