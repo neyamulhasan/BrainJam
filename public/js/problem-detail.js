@@ -374,6 +374,24 @@ function displayTestResults(results) {
     
     const { status, message, testResults, executionTime, memoryUsed } = results;
     
+    // Check if it's our special message about compilers not being implemented
+    if (testResults && testResults.length > 0 && 
+        testResults[0].actualOutput && testResults[0].actualOutput.includes("Test functionality not fully implemented yet")) {
+        resultsContainer.innerHTML = `
+            <div class="test-results-header warning">
+                <div class="result-status">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>Test Results</h3>
+                    <span class="status-badge warning">Development Mode</span>
+                </div>
+                <p class="result-message">Running in simulation mode</p>
+                <p>The compiler/interpreter for this language is currently in development mode.</p>
+                <p>Try JavaScript or Python for best simulation experience.</p>
+            </div>
+        `;
+        return;
+    }
+    
     // Create results header
     const headerClass = status === 'passed' ? 'success' : (status === 'no_tests' ? 'warning' : 'error');
     const headerIcon = status === 'passed' ? 'check-circle' : (status === 'no_tests' ? 'info-circle' : 'times-circle');

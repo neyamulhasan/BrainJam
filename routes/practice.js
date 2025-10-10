@@ -365,122 +365,111 @@ async function executeCodeWithTestCases(code, language, testCases) {
 }
 
 /**
- * Execute code with given input (simplified execution for demonstration)
+ * Execute code with given input using Judge0 API
  */
 async function executeCode(code, language, input) {
-    // This is a simplified implementation
-    // In production, you would use Docker containers or a sandboxed environment
+    // Import Judge0 configuration and functions
+    const judge0 = require('../config/judge0');
     
-    const fs = require('fs').promises;
-    const { exec } = require('child_process');
-    const path = require('path');
-    const crypto = require('crypto');
+    // Check if compilers are disabled (for development/testing)
+    const DISABLE_COMPILERS = false; // API key is configured and working
     
-    // Create unique filename
-    const uniqueId = crypto.randomBytes(16).toString('hex');
-    const tempDir = path.join(__dirname, '../temp');
-    
-    // Ensure temp directory exists
-    try {
-        await fs.mkdir(tempDir, { recursive: true });
-    } catch (error) {
-        // Directory might already exist
-    }
-    
-    const startTime = Date.now();
-    
-    try {
-        let filename, compileCmd, runCmd;
+    if (DISABLE_COMPILERS) {
+        console.log(`[DEV MODE] Simulating execution for ${language} code with input: ${input}`);
         
-        switch (language.toLowerCase()) {
-            case 'python':
-                filename = path.join(tempDir, `solution_${uniqueId}.py`);
-                await fs.writeFile(filename, code);
-                runCmd = `echo "${input}" | python3 "${filename}"`;
-                break;
-                
-            case 'javascript':
-                filename = path.join(tempDir, `solution_${uniqueId}.js`);
-                // Wrap code to read from stdin
-                const jsCode = `
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-let inputLines = [];
-rl.on('line', (line) => {
-    inputLines.push(line);
-});
-
-rl.on('close', () => {
-    const input = inputLines.join('\\n');
-    ${code}
-});
-`;
-                await fs.writeFile(filename, jsCode);
-                runCmd = `echo "${input}" | node "${filename}"`;
-                break;
-                
-            case 'cpp':
-                filename = path.join(tempDir, `solution_${uniqueId}.cpp`);
-                const executableName = path.join(tempDir, `solution_${uniqueId}`);
-                await fs.writeFile(filename, code);
-                compileCmd = `g++ -o "${executableName}" "${filename}"`;
-                runCmd = `echo "${input}" | "${executableName}"`;
-                break;
-                
-            case 'java':
-                filename = path.join(tempDir, `Solution_${uniqueId}.java`);
-                // Modify code to use the correct class name
-                const javaCode = code.replace(/public\s+class\s+\w+/g, `public class Solution_${uniqueId}`);
-                await fs.writeFile(filename, javaCode);
-                compileCmd = `javac "${filename}"`;
-                runCmd = `echo "${input}" | java -cp "${tempDir}" Solution_${uniqueId}`;
-                break;
-                
-            default:
-                throw new Error(`Language ${language} not supported`);
-        }
+        // Advanced simulation mode that attempts to understand the code and provide realistic outputs
+        let simulatedOutput = "";
         
-        // Compile if needed
-        if (compileCmd) {
-            await executeCommand(compileCmd);
-        }
-        
-        // Run the code
-        const output = await executeCommand(runCmd, 5000); // 5 second timeout
-        const executionTime = Date.now() - startTime;
-        
-        // Clean up files
         try {
-            await fs.unlink(filename);
-            if (language.toLowerCase() === 'cpp') {
-                await fs.unlink(path.join(tempDir, `solution_${uniqueId}`));
+            // Process different languages
+            if (language === 'javascript') {
+                simulatedOutput = simulateJavaScript(code, input);
+            } 
+            else if (language === 'python') {
+                simulatedOutput = simulatePython(code, input);
+            } 
+            else if (language === 'c') {
+                simulatedOutput = simulateC(code, input);
             }
-            if (language.toLowerCase() === 'java') {
-                await fs.unlink(path.join(tempDir, `Solution_${uniqueId}.class`));
+            else if (language === 'c++') {
+                simulatedOutput = simulateCpp(code, input);
             }
-        } catch (cleanupError) {
-            console.warn('Cleanup error:', cleanupError.message);
+            else if (language === 'java') {
+                simulatedOutput = simulateJava(code, input);
+            }
+            else {
+                simulatedOutput = "Simulation not available for " + language;
+            }
+        } catch (error) {
+            console.log("Simulation error:", error.message);
+            simulatedOutput = `Runtime Error: ${error.message}`;
         }
         
         return {
-            output: output.trim(),
-            executionTime: executionTime,
-            memoryUsed: 1024, // Mock memory usage
+            output: simulatedOutput,
+            executionTime: Math.floor(Math.random() * 100) + 50, // Random execution time between 50-150ms
+            memoryUsed: Math.floor(Math.random() * 2048) + 512,  // Random memory usage between 512-2560KB
             error: null
+        };
+    }
+    
+    try {
+        // Get the Judge0 language ID from our language name
+        const [languageResult] = await db.execute(
+            'SELECT judge0_id FROM languages WHERE name LIKE ? OR name = ? LIMIT 1', 
+            [`%${language}%`, language]
+        );
+        
+        if (!languageResult || languageResult.length === 0) {
+            throw new Error(`Language ${language} not supported`);
+        }
+        
+        const judge0LanguageId = languageResult[0].judge0_id;
+        console.log(`Using Judge0 language ID: ${judge0LanguageId} for language: ${language}`);
+        
+        // Execute code using Judge0 API
+        const startTime = Date.now();
+        const result = await judge0.executeWithJudge0(code, judge0LanguageId, input, {
+            cpu_time_limit: 5,       // 5 seconds
+            memory_limit: 512000,    // 500 MB
+            base64_encoded: false    // Not using base64 encoding for simplicity
+        });
+        
+        const executionTime = Date.now() - startTime;
+        
+        // Save execution record to database (optional)
+        try {
+            await db.execute(`
+                INSERT INTO practice_runs 
+                (user_id, problem_id, language_id, source_code, stdin, stdout, stderr, status, execution_time_ms, memory_kb, judge0_token)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [
+                null, // user_id (if no user is logged in)
+                null, // problem_id (if just testing code snippets)
+                languageResult[0].id,
+                code,
+                input,
+                result.output,
+                result.error || '',
+                result.status?.description || 'Finished',
+                result.executionTime,
+                result.memoryUsed,
+                result.token
+            ]);
+        } catch (dbError) {
+            console.warn('Failed to save practice run to database:', dbError);
+            // Continue execution even if database save fails
+        }
+        
+        return {
+            output: result.output,
+            executionTime: result.executionTime,
+            memoryUsed: result.memoryUsed,
+            error: result.error || null
         };
         
     } catch (error) {
-        // Clean up files on error
-        try {
-            await fs.unlink(filename);
-        } catch (cleanupError) {
-            // Ignore cleanup errors
-        }
-        
+        console.error('Judge0 execution error:', error);
         throw error;
     }
 }
