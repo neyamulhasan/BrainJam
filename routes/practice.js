@@ -273,49 +273,6 @@ router.post('/submit-solution', async (req, res) => {
 
 module.exports = router;
 
-// Helper Functions
-
-/**
- * Get test cases for a problem
- */
-async function getTestCases(problemId, includeHidden = false) {
-    try {
-        const query = includeHidden 
-            ? 'SELECT * FROM test_cases WHERE problem_id = ? ORDER BY is_sample DESC, case_order ASC'
-            : 'SELECT * FROM test_cases WHERE problem_id = ? AND is_sample = 1 ORDER BY case_order ASC';
-            
-        const [rows] = await db.execute(query, [problemId]);
-        
-        // Map database column names to expected names
-        return rows.map(row => ({
-            id: row.id,
-            problem_id: row.problem_id,
-            input: row.input_data,
-            expected_output: row.expected_output,
-            is_sample: row.is_sample
-        }));
-    } catch (error) {
-        console.error('Error fetching test cases:', error);
-        // Return sample test cases for testing
-        return [
-            {
-                id: 1,
-                problem_id: problemId,
-                input: '2 3',
-                expected_output: '5',
-                is_sample: 1
-            },
-            {
-                id: 2,
-                problem_id: problemId,
-                input: '10 15',
-                expected_output: '25',
-                is_sample: 1
-            }
-        ];
-    }
-}
-
 /**
  * Execute code against test cases
  */
