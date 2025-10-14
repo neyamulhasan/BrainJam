@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Testing - BrainJam</title>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #1a1a1a; 
+            color: #ffffff; 
+            padding: 20px; 
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+        .test-section { 
+            background: #2a2a2a; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            border: 1px solid #444; 
+        }
+        .test-button { 
+            background: #00ff88; 
+            color: #1a1a1a; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 10px; 
+            font-weight: 600; 
+        }
+        .test-button:hover { background: #00cc7a; }
+        .results { background: #333; padding: 15px; border-radius: 4px; margin-top: 15px; }
+        .success { color: #00ff88; }
+        .error { color: #ff4757; }
+    </style>
+</head>
+<body>
+    <h1>🏆 Contest System Test</h1>
+    <p>Test the contest "Enter Contest" functionality</p>
+
+    <div class="test-section">
+        <h3>1. Create Test Contest</h3>
+        <p>Create a sample contest for testing</p>
+        <button class="test-button" onclick="createTestContest()">Create Test Contest</button>
+        <div id="create-results" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Register for Contest</h3>
+        <p>Register the current user for the test contest</p>
+        <input type="number" id="contest-id" placeholder="Contest ID" style="padding: 8px; margin-right: 10px;">
+        <button class="test-button" onclick="registerForContest()">Register</button>
+        <div id="register-results" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Enter Contest</h3>
+        <p>Test the "Enter Contest" flow</p>
+        <button class="test-button" onclick="testEnterContest()">Enter Contest (Test)</button>
+        <div id="enter-results" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Quick Test with Sample Data</h3>
+        <p>If you have existing contests in the database, test with these:</p>
+        <button class="test-button" onclick="testWithSampleData()">Test with Contest ID=1</button>
+        <div id="sample-results" class="results" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Navigation Links</h3>
+        <p>Quick navigation to test the flow</p>
+        <a href="compete.html" class="test-button" style="text-decoration: none; display: inline-block;">Go to Compete Page</a>
+        <a href="contest.html?id=1" class="test-button" style="text-decoration: none; display: inline-block;">Go to Contest Page (ID=1)</a>
+        <a href="contest.html?id=999" class="test-button" style="text-decoration: none; display: inline-block;">Test Invalid Contest ID</a>
+    </div>
+
+    <script>
+        let testContestId = null;
+
+        async function testWithSampleData() {
+            const resultsDiv = document.getElementById('sample-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '🔄 Testing with sample contest data...';
+
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                
+                // Test contest status check
+                const statusResponse = await fetch('/api/contests/1/status', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">✅ Contest ID=1 found!</div>
+                        <p>Registration Status: ${statusData.is_registered ? '✅ Registered' : '❌ Not Registered'}</p>
+                        <p>Contest Status: ${statusData.contest_status}</p>
+                        ${statusData.is_registered ? 
+                            '<a href="contest.html?id=1" class="test-button" style="text-decoration: none; display: inline-block; margin-top: 10px;">🚀 Enter Contest</a>' :
+                            '<button class="test-button" onclick="registerForSpecificContest(1)">Register for Contest</button>'
+                        }
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">❌ No contest found with ID=1. Create a contest first or check the database.</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function registerForSpecificContest(contestId) {
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                const response = await fetch(`/api/contests/${contestId}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('sample-results').innerHTML = `
+                        <div class="success">✅ Registered successfully!</div>
+                        <a href="contest.html?id=${contestId}" class="test-button" style="text-decoration: none; display: inline-block; margin-top: 10px;">🚀 Enter Contest</a>
+                    `;
+                } else {
+                    document.getElementById('sample-results').innerHTML = `<div class="error">❌ Registration failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('sample-results').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function createTestContest() {
+            const resultsDiv = document.getElementById('create-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '🔄 Creating test contest...';
+
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                // Create contest with future times
+                const now = new Date();
+                const startTime = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes from now
+                const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
+
+                const response = await fetch('/api/contests/create-contest', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Contest - Enter Contest Demo',
+                        description: 'This is a test contest to demonstrate the Enter Contest functionality.',
+                        start_time: startTime.toISOString().slice(0, 19).replace('T', ' '),
+                        duration_hours: 2,
+                        problem_ids: [1, 2] // Assuming some problems exist
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    testContestId = data.contest_id;
+                    document.getElementById('contest-id').value = testContestId;
+                    resultsDiv.innerHTML = `<div class="success">✅ Test contest created successfully!<br>Contest ID: ${testContestId}<br>Start Time: ${startTime.toLocaleString()}</div>`;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Failed to create contest: ${data.message || data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error creating test contest:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function registerForContest() {
+            const contestId = document.getElementById('contest-id').value;
+            const resultsDiv = document.getElementById('register-results');
+            resultsDiv.style.display = 'block';
+
+            if (!contestId) {
+                resultsDiv.innerHTML = '<div class="error">❌ Please enter a contest ID</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '🔄 Registering for contest...';
+
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+                const response = await fetch(`/api/contests/${contestId}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultsDiv.innerHTML = `<div class="success">✅ ${data.message || 'Successfully registered for contest!'}</div>`;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Registration failed: ${data.message || data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error registering for contest:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        async function testEnterContest() {
+            const contestId = document.getElementById('contest-id').value || testContestId;
+            const resultsDiv = document.getElementById('enter-results');
+            resultsDiv.style.display = 'block';
+
+            if (!contestId) {
+                resultsDiv.innerHTML = '<div class="error">❌ No contest ID available. Create and register for a contest first.</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '🔄 Testing enter contest flow...';
+
+            try {
+                const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+
+                // Check registration status
+                const statusResponse = await fetch(`/api/contests/${contestId}/status`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const statusData = await statusResponse.json();
+
+                if (!statusResponse.ok) {
+                    resultsDiv.innerHTML = `<div class="error">❌ Status check failed: ${statusData.message || statusData.error}</div>`;
+                    return;
+                }
+
+                if (!statusData.is_registered) {
+                    resultsDiv.innerHTML = '<div class="error">❌ You must register for this contest before entering</div>';
+                    return;
+                }
+
+                // If registered, simulate the navigation
+                resultsDiv.innerHTML = `
+                    <div class="success">✅ Enter contest check passed!</div>
+                    <p>Registration Status: ✅ Registered</p>
+                    <p>Would redirect to: <code>/contest.html?id=${contestId}</code></p>
+                    <a href="contest.html?id=${contestId}" class="test-button" style="text-decoration: none; display: inline-block; margin-top: 10px;">
+                        🚀 Go to Contest Page
+                    </a>
+                `;
+
+            } catch (error) {
+                console.error('Error testing enter contest:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) {
+                document.body.innerHTML = `
+                    <h1>🔐 Authentication Required</h1>
+                    <p>Please <a href="login.html" style="color: #00ff88;">login</a> first to test contest functionality.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
