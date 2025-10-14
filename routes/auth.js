@@ -10,7 +10,7 @@ const router = express.Router();
 const generateToken = (user) => {
     return jwt.sign(
         { id: user.id, username: user.username, role: user.role },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET || 'brainjam-secret-key-2025',
         { expiresIn: process.env.JWT_EXPIRE }
     );
 };
@@ -182,7 +182,7 @@ const authenticateToken = (req, res, next) => {
         });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET || 'brainjam-secret-key-2025', (err, user) => {
         if (err) {
             return res.status(403).json({
                 success: false,

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest - BrainJam</title>
+    <link rel="stylesheet" href="./css/home.css">
+    <link rel="stylesheet" href="./css/contest.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>BrainJam</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="compete.html" class="nav-link">
+                    <i class="fas fa-trophy"></i> Compete
+                </a>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Contest Header -->
+            <div class="contest-header">
+                <div class="contest-info">
+                    <h1 id="contest-title">Loading Contest...</h1>
+                    <p id="contest-description">Loading description...</p>
+                    <div class="contest-meta">
+                        <span id="contest-time"><i class="fas fa-clock"></i> Loading...</span>
+                        <span id="contest-participants"><i class="fas fa-users"></i> Loading...</span>
+                    </div>
+                </div>
+                <div class="contest-status">
+                    <span id="contest-status-badge" class="status-badge">Loading...</span>
+                    <div id="time-remaining" class="time-remaining">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problems Section -->
+            <div class="problems-section">
+                <h2>
+                    <i class="fas fa-list"></i>
+                    Contest Problems
+                </h2>
+                <div id="problems-container" class="problems-container">
+                    <div class="loading">Loading problems...</div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Section -->
+            <div class="leaderboard-section">
+                <h2>
+                    <i class="fas fa-trophy"></i>
+                    Leaderboard
+                </h2>
+                <div id="leaderboard-container" class="leaderboard-container">
+                    <div class="loading">Loading leaderboard...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Problem Solving Modal -->
+    <div id="problem-modal" class="modal">
+        <div class="modal-content problem-modal-content">
+            <div class="modal-header">
+                <h2 id="problem-modal-title">Problem Title</h2>
+                <span class="close" onclick="closeProblemModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="problem-layout">
+                    <div class="problem-description">
+                        <div id="problem-description-content">
+                            <div class="loading">Loading problem...</div>
+                        </div>
+                    </div>
+                    <div class="code-editor">
+                        <div class="editor-header">
+                            <select id="language-select" class="language-select">
+                                <option value="javascript">JavaScript</option>
+                                <option value="python">Python</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                            </select>
+                            <div class="editor-actions">
+                                <button id="run-code-btn" class="btn btn-secondary">
+                                    <i class="fas fa-play"></i> Run
+                                </button>
+                                <button id="submit-code-btn" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="code-editor" class="code-textarea" placeholder="Write your solution here..."></textarea>
+                        <div id="output-section" class="output-section">
+                            <h4>Output:</h4>
+                            <div id="code-output" class="code-output"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="./js/contest.js"></script>
+</body>
+</html>
