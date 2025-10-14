@@ -6,22 +6,31 @@ const authenticateToken = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
+        
+        console.log('🔐 Auth check:', { 
+            authHeader: authHeader ? 'Present' : 'Missing',
+            token: token ? 'Present' : 'Missing',
+            path: req.path
+        });
 
         if (!token) {
+            console.log('❌ No token provided');
             return res.status(401).json({
                 success: false,
                 error: 'Access denied. No token provided.'
             });
         }
 
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET || 'brainjam-secret-key-2025', (err, user) => {
             if (err) {
+                console.log('❌ Token verification failed:', err.message);
                 return res.status(403).json({
                     success: false,
                     error: 'Invalid token'
                 });
             }
 
+            console.log('✅ Token verified for user:', user.id);
             req.user = user;
             next();
         });

@@ -12,6 +12,7 @@ const learningRoutes = require('./routes/learning');
 const learnRoutes = require('./routes/learn');
 const practiceRoutes = require('./routes/practice');
 const problemsRoutes = require('./routes/problems');
+const contestsRoutes = require('./routes/create_contest');
 
 const db = require('./config/database');
 
@@ -38,16 +39,10 @@ function isPortAvailable(port) {
 // Function to find available port (only 3000 or 3001)
 async function findAvailablePort() {
     const allowedPorts = [3000, 3001];
-    console.log(`🔍 Checking available ports: ${allowedPorts.join(', ')}...`);
     
     for (const port of allowedPorts) {
-        console.log(`🔌 Checking port ${port}...`);
-        
         if (await isPortAvailable(port)) {
-            console.log(`✅ Port ${port} is available!`);
             return port;
-        } else {
-            console.log(`🔄 Port ${port} is in use`);
         }
     }
     
@@ -69,6 +64,8 @@ app.use('/api/learning', learningRoutes);
 app.use('/api/learn', learnRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/problems', problemsRoutes);
+app.use('/api/contests', contestsRoutes);
+console.log('📌 Contests routes loaded');
 
 
 // Serve HTML pages
@@ -123,6 +120,15 @@ app.get('/problem-management', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'problem-management.html'));
 });
 
+// Example for your admin create page:
+app.get('/admin-create-contest', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-create-contest.html'));
+});
+
+app.get('/admin-contest-management', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin-contest-management.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
@@ -143,18 +149,13 @@ async function startServer() {
         let PORT;
         if (preferredPort && (preferredPort === 3000 || preferredPort === 3001)) {
             // If PORT is specified and is 3000 or 3001, check if it's available
-            console.log(`🎯 Checking preferred port ${preferredPort} from environment...`);
             if (await isPortAvailable(preferredPort)) {
                 PORT = preferredPort;
-                console.log(`✅ Using preferred port ${PORT}`);
             } else {
-                console.log(`🔄 Port ${preferredPort} is in use, checking alternative...`);
                 // Try the other port (if preferred is 3000, try 3001, and vice versa)
                 const alternativePort = preferredPort === 3000 ? 3001 : 3000;
-                console.log(`🔌 Checking port ${alternativePort}...`);
                 if (await isPortAvailable(alternativePort)) {
                     PORT = alternativePort;
-                    console.log(`✅ Port ${alternativePort} is available!`);
                 } else {
                     throw new Error(`Both ports 3000 and 3001 are in use. Please free one of these ports and try again.`);
                 }
@@ -169,15 +170,11 @@ async function startServer() {
         
         app.listen(PORT, () => {
             console.log(`🚀 BrainJam Arena server running on http://localhost:${PORT}`);
-            console.log(`📊 Database: ${process.env.DB_NAME}@${process.env.DB_HOST}:${process.env.DB_PORT}`);
-            console.log(`💡 Server selected port ${PORT} (only 3000/3001 allowed)`);
             console.log(`🌐 Access your application at: http://localhost:${PORT}`);
         });
         
     } catch (error) {
         console.error('❌ Failed to start server:', error.message);
-        console.log('💡 Please free either port 3000 or 3001 and try again');
-        console.log('💡 You can check what\'s using these ports with: lsof -i :3000 or lsof -i :3001');
         process.exit(1);
     }
 }

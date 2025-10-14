@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - BrainJam</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/admin-buttons.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/admin-contest-management.css" />
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Sidebar Navigation -->
+      <div class="sidebar">
+        <h2>Admin Panel</h2>
+
+        <nav class="nav-menu">
+          <a href="admin-dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="content-management.html" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Content Management</span>
+          </a>
+          <a href="admin-contest-managment.html" class="nav-item active">
+            <i class="fas fa-trophy"></i>
+            <span>Competition Management</span>
+          </a>
+          <a href="problem-management.html" class="nav-item">
+            <i class="fas fa-code"></i>
+            <span>Problem Management</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <header class="admin-header">
+          <h1><i class="fas fa-trophy"></i> Competition Management</h1>
+          <div class="header-actions">
+            <button id="createContestBtn" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Create Competition
+            </button>
+            <button id="logout-btn" class="btn btn-danger">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </header>
+
+        <div class="content">
+          <!-- Search and Filter Section -->
+          <div class="search-filter-section">
+            <div class="search-box">
+              <input type="text" id="contestSearch" placeholder="Search competitions...">
+              <i class="fas fa-search"></i>
+            </div>
+            <div class="filter-options">
+              <select id="statusFilter">
+                <option value="">All Status</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="live">Live</option>
+                <option value="ended">Ended</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Competition Name</th>
+                  <th>Start Time</th>
+                  <th>Duration</th>
+                  <th>Participants</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="contestTableBody">
+                <!-- Dynamic content from DB will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contest Details Modal -->
+      <div id="contestModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="contestTitle">Competition Details</h2>
+            <span class="close-btn">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="contest-info">
+              <div class="info-item">
+                <strong>Start Time:</strong> <span id="contestStart"></span>
+              </div>
+              <div class="info-item">
+                <strong>Duration:</strong> <span id="contestDuration"></span> hours
+              </div>
+              <div class="info-item">
+                <strong>Participants:</strong> <span id="contestParticipants"></span>
+              </div>
+              <div class="info-item">
+                <strong>Status:</strong> <span id="contestStatus"></span>
+              </div>
+            </div>
+            <div class="problems-section">
+              <h3>Problems</h3>
+              <ul id="contestProblems"></ul>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button id="editContestBtn" class="btn btn-primary">
+              <i class="fas fa-edit"></i> Edit Competition
+            </button>
+            <button id="deleteContestBtn" class="btn btn-danger">
+              <i class="fas fa-trash"></i> Delete Competition
+            </button>
+            <button class="btn btn-secondary close-modal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="js/admin-common.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/admin-auth.js"></script>
+    <script src="js/admin-contest-managment.js"></script>
+  </body>
+</html>
