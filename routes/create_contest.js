@@ -209,6 +209,54 @@ router.get("/:id/details", authenticateToken, async (req, res) => {
   }
 });
 
+// Get contest info for registered users (non-admin)
+router.get("/:id/info", authenticateToken, async (req, res) => {
+  try {
+    const contestId = req.params.id;
+    const userId = req.user.id;
+    
+    // Check if user is registered
+    const [registration] = await db.execute(
+      "SELECT * FROM contest_participants WHERE contest_id = ? AND user_id = ?",
+      [contestId, userId]
+    );
+    
+    if (registration.length === 0) {
+      return res.status(403).json({ 
+        success: false, 
+        error: "You must be registered for this contest to access it" 
+      });
+    }
+    
+    // Get contest details
+    const [contests] = await db.execute(`
+      SELECT c.*, 
+             (SELECT COUNT(*) FROM contest_participants WHERE contest_id = c.id) as participant_count
+      FROM contests c
+      WHERE c.id = ?
+    `, [contestId]);
+    
+    if (contests.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Contest not found" 
+      });
+    }
+    
+    res.json({
+      success: true,
+      contest: contests[0]
+    });
+    
+  } catch (error) {
+    console.error("❌ Error fetching contest info:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to fetch contest info" 
+    });
+  }
+});
+
 // Fetch contest details including problems (Admin only)
 router.get("/:id", authenticateToken, isAdmin, async (req, res) => {
   const contestId = req.params.id;
@@ -391,7 +439,7 @@ router.get("/:id/problems", authenticateToken, async (req, res) => {
     
     // Get contest problems
     const [problems] = await db.execute(`
-      SELECT p.id, p.title, p.slug, p.difficulty, p.body_md, p.description
+      SELECT p.id, p.title, p.slug, p.difficulty, p.body_md
       FROM problems p
       JOIN contest_problems cp ON p.id = cp.problem_id
       WHERE cp.contest_id = ?
@@ -447,6 +495,128 @@ router.get("/:id/leaderboard", authenticateToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: "Failed to fetch contest leaderboard" 
+    });
+  }
+});
+
+// Track contest problem submission
+router.post("/:id/submit/:problemId", authenticateToken, async (req, res) => {
+  try {
+    const contestId = req.params.id;
+    const problemId = req.params.problemId;
+    const userId = req.user.id;
+    const { status, score = 0 } = req.body;
+    
+    // Check if user is registered for the contest
+    const [registration] = await db.execute(
+      "SELECT * FROM contest_participants WHERE contest_id = ? AND user_id = ?",
+      [contestId, userId]
+    );
+    
+    if (registration.length === 0) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "You must be registered for this contest" 
+      });
+    }
+    
+    // Record the submission
+    await db.execute(`
+      INSERT INTO contest_submissions (contest_id, user_id, problem_id, status, score, submitted_at)
+      VALUES (?, ?, ?, ?, ?, NOW())
+      ON DUPLICATE KEY UPDATE 
+        status = VALUES(status),
+        score = GREATEST(score, VALUES(score)),
+        submitted_at = VALUES(submitted_at)
+    `, [contestId, userId, problemId, status, score]);
+    
+    // Check if user has solved all problems in the contest
+    const [contestProblems] = await db.execute(
+      "SELECT COUNT(*) as total_problems FROM contest_problems WHERE contest_id = ?",
+      [contestId]
+    );
+    
+    const [userSolvedProblems] = await db.execute(
+      "SELECT COUNT(*) as solved_problems FROM contest_submissions WHERE contest_id = ? AND user_id = ? AND status = 'Accepted'",
+      [contestId, userId]
+    );
+    
+    let allProblemsCompleted = false;
+    if (userSolvedProblems[0].solved_problems === contestProblems[0].total_problems) {
+      allProblemsCompleted = true;
+      
+      // Check if this user is the first to complete all problems
+      const [firstCompletion] = await db.execute(`
+        SELECT user_id, MIN(submitted_at) as completion_time 
+        FROM (
+          SELECT cs.user_id, MAX(cs.submitted_at) as submitted_at
+          FROM contest_submissions cs
+          WHERE cs.contest_id = ? AND cs.status = 'Accepted'
+          GROUP BY cs.user_id
+          HAVING COUNT(DISTINCT cs.problem_id) = ?
+        ) as completed_users
+        ORDER BY completion_time ASC
+        LIMIT 1
+      `, [contestId, contestProblems[0].total_problems]);
+      
+      if (firstCompletion.length > 0 && firstCompletion[0].user_id === userId) {
+        // This user is the first to complete all problems!
+        await db.execute(`
+          INSERT INTO contest_achievements (contest_id, user_id, achievement_type, achieved_at)
+          VALUES (?, ?, 'first_complete', NOW())
+          ON DUPLICATE KEY UPDATE achieved_at = VALUES(achieved_at)
+        `, [contestId, userId]);
+      }
+    }
+    
+    console.log('✅ Contest submission recorded:', {
+      contestId,
+      userId,
+      problemId,
+      status,
+      score,
+      allProblemsCompleted
+    });
+    
+    res.json({ 
+      success: true, 
+      message: "Submission recorded",
+      allProblemsCompleted
+    });
+    
+  } catch (error) {
+    console.error("❌ Error recording contest submission:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to record submission" 
+    });
+  }
+});
+
+// Get contest achievements
+router.get("/:id/achievements", authenticateToken, async (req, res) => {
+  try {
+    const contestId = req.params.id;
+    
+    const [achievements] = await db.execute(`
+      SELECT 
+        ca.user_id,
+        u.username,
+        ca.achievement_type,
+        ca.achieved_at
+      FROM contest_achievements ca
+      JOIN users u ON ca.user_id = u.id
+      WHERE ca.contest_id = ?
+      ORDER BY ca.achieved_at ASC
+    `, [contestId]);
+    
+    res.json({ success: true, achievements });
+    
+  } catch (error) {
+    console.error("❌ Error fetching contest achievements:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch achievements" 
     });
   }
 });
