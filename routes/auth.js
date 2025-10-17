@@ -20,12 +20,25 @@ router.post('/register', [
     body('username')
         .isLength({ min: 3, max: 32 })
         .withMessage('Username must be between 3 and 32 characters')
+        // Allow letters, numbers and underscores, but not only digits
         .matches(/^[a-zA-Z0-9_]+$/)
-        .withMessage('Username can only contain letters, numbers, and underscores'),
+        .withMessage('Username can only contain letters, numbers, and underscores')
+        .custom(value => {
+            if (/^[0-9]+$/.test(value)) {
+                throw new Error('Username cannot be only numbers');
+            }
+            return true;
+        }),
     body('email')
         .isEmail()
-        .normalizeEmail()
-        .withMessage('Please provide a valid email'),
+        .withMessage('Please provide a valid email')
+        // Ensure the email is lowercase to enforce case-insensitive policy
+        .custom((value) => {
+            if (value !== value.toLowerCase()) {
+                throw new Error('Email must be lowercase');
+            }
+            return true;
+        }),
     body('password')
         .isLength({ min: 6 })
         .withMessage('Password must be at least 6 characters long'),
@@ -47,7 +60,9 @@ router.post('/register', [
             });
         }
 
-        const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
+    // Normalize stored values
+    email = email.toLowerCase();
 
         // Check if user already exists
         const [existingUsers] = await db.execute(
@@ -122,13 +137,28 @@ router.post('/login', [
             });
         }
 
-        const { identifier, password } = req.body;
+        let { identifier, password } = req.body;
 
-        // Find user by username or email
-        const [users] = await db.execute(
-            'SELECT id, username, email, password_hash, role, rating, rank_label FROM users WHERE username = ? OR email = ?',
-            [identifier, identifier]
-        );
+        // Determine if identifier is email or username
+        const isEmail = identifier && identifier.includes('@');
+
+        let users;
+
+        if (isEmail) {
+            // Normalize email identifier to lowercase so login is case-insensitive for emails
+            identifier = identifier.toLowerCase();
+            // Find user by email (case-insensitive because emails are stored lowercased)
+            [users] = await db.execute(
+                'SELECT id, username, email, password_hash, role, rating, rank_label FROM users WHERE email = ? LIMIT 1',
+                [identifier]
+            );
+        } else {
+            // Find user by username using case-sensitive comparison
+            [users] = await db.execute(
+                'SELECT id, username, email, password_hash, role, rating, rank_label FROM users WHERE username = BINARY ? LIMIT 1',
+                [identifier]
+            );
+        }
 
         if (users.length === 0) {
             return res.status(401).json({
