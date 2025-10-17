@@ -53,21 +53,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordField = document.getElementById('password');
     const confirmPasswordField = document.getElementById('confirmPassword');
 
-    // Username validation
+    // Username validation (allow digits but not all digits)
     usernameField.addEventListener('blur', function() {
         const username = this.value.trim();
         if (username && username.length < 3) {
             showFieldError('username', 'Username must be at least 3 characters');
         } else if (username && !/^[a-zA-Z0-9_]+$/.test(username)) {
             showFieldError('username', 'Username can only contain letters, numbers, and underscores');
+        } else if (username && /^[0-9]+$/.test(username)) {
+            showFieldError('username', 'Username cannot be only numbers');
         }
     });
 
-    // Email validation
+    // Email validation (must be lowercase)
     emailField.addEventListener('blur', function() {
         const email = this.value.trim();
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showFieldError('email', 'Please enter a valid email address');
+        } else if (email && email !== email.toLowerCase()) {
+            showFieldError('email', 'Email must be lowercase');
         }
     });
 
@@ -122,6 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (!/^[a-zA-Z0-9_]+$/.test(data.username)) {
             showFieldError('username', 'Username can only contain letters, numbers, and underscores');
             hasErrors = true;
+        } else if (/^[0-9]+$/.test(data.username)) {
+            showFieldError('username', 'Username cannot be only numbers');
+            hasErrors = true;
         }
 
         if (!data.email.trim()) {
@@ -129,6 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
             hasErrors = true;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
             showFieldError('email', 'Please enter a valid email address');
+            hasErrors = true;
+        } else if (data.email !== data.email.toLowerCase()) {
+            showFieldError('email', 'Email must be lowercase');
             hasErrors = true;
         }
 
@@ -175,9 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 showMessage('Registration successful! Welcome to BrainJam Arena!', 'success');
                 
-                // Redirect to dashboard
+                // Redirect to appropriate dashboard based on role
                 setTimeout(() => {
-                    window.location.href = '/dashboard.html';
+                    const user = result.user;
+                    window.location.href = user && user.role === 'admin' ? '/admin-dashboard.html' : '/dashboard.html';
                 }, 1500);
             } else {
                 if (result.errors) {
@@ -204,8 +215,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check if user is already logged in
     const token = localStorage.getItem('authToken');
-    if (token) {
-        // Redirect to dashboard if already logged in
-        window.location.href = '/dashboard.html';
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+        const user = JSON.parse(storedUser);
+        window.location.href = user.role === 'admin' ? '/admin-dashboard.html' : '/dashboard.html';
     }
 });

@@ -66,12 +66,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check if user is logged in
     const token = localStorage.getItem('authToken');
-    if (token) {
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+        const user = JSON.parse(storedUser);
         // Update navigation to show user is logged in
         const signInBtn = document.querySelector('.sign-up-btn');
         if (signInBtn) {
             signInBtn.textContent = 'Dashboard';
-            signInBtn.href = '/dashboard.html';
+            // Redirect admin users to admin dashboard
+            signInBtn.href = user.role === 'admin' ? '/admin-dashboard.html' : '/dashboard.html';
         }
     }
 });

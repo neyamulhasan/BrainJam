@@ -142,8 +142,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check if user is already logged in
     const token = localStorage.getItem('authToken');
-    if (token) {
-        // Redirect to dashboard if already logged in
-        window.location.href = '/dashboard.html';
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+        const user = JSON.parse(storedUser);
+        // Redirect to appropriate dashboard
+        window.location.href = user.role === 'admin' ? '/admin-dashboard.html' : '/dashboard.html';
     }
 });
