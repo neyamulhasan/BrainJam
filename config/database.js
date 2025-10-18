@@ -74,24 +74,65 @@ async function initializePool() {
     }
 }
 
-// Initialize the pool
-initializePool();
+// Initialize the pool with retry logic
+let initializationPromise = null;
+
+async function initializePoolWithRetry() {
+    if (initializationPromise) {
+        return initializationPromise;
+    }
+    
+    initializationPromise = (async () => {
+        let retries = 10;
+        while (retries > 0) {
+            try {
+                pool = await createMySQLConnection();
+                
+                // Test the pool connection
+                const connection = await pool.getConnection();
+                console.log('✅ MySQL pool initialized successfully');
+                connection.release();
+                return pool;
+                
+            } catch (error) {
+                retries--;
+                console.log(`⏳ Database connection attempt failed (${10 - retries}/10). Retrying in 3 seconds...`);
+                console.log(`   Error: ${error.message}`);
+                
+                if (retries === 0) {
+                    console.error('❌ MySQL pool initialization failed after all retries:', error.message);
+                    console.log('💡 Make sure MySQL is running on port 3306 or 4306 (XAMPP)');
+                    console.log('💡 Check your database credentials in the .env file');
+                    throw error;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+        }
+    })();
+    
+    return initializationPromise;
+}
+
+// Start initialization
+initializePoolWithRetry();
 
 // Export a function that returns the pool when ready
-function getPool() {
+async function getPool() {
     if (!pool) {
-        throw new Error('Database pool not initialized. Please wait for the connection to establish.');
+        console.log('⏳ Waiting for database pool initialization...');
+        await initializePoolWithRetry();
     }
     return pool;
 }
 
 module.exports = {
     execute: async (query, params) => {
-        const dbPool = getPool();
+        const dbPool = await getPool();
         return await dbPool.execute(query, params);
     },
     getConnection: async () => {
-        const dbPool = getPool();
+        const dbPool = await getPool();
         return await dbPool.getConnection();
     }
 };

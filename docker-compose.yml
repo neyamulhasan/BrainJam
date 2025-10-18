@@ -1,0 +1,57 @@
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: brainjam-mysql-public
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: brainjam_public_root
+      MYSQL_DATABASE: brain_jam
+      MYSQL_USER: brainjam_user
+      MYSQL_PASSWORD: brainjam_shared_password
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_public_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - brainjam-public-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # BrainJam Application Service with Shared Judge0 API
+  app:
+    build: .
+    container_name: brainjam-app-public
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.shared
+    volumes:
+      - app_uploads:/app/public/uploads
+      - app_temp:/app/temp
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - brainjam-public-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mysql_public_data:
+  app_uploads:
+  app_temp:
+
+networks:
+  brainjam-public-network:
+    driver: bridge
