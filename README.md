@@ -1,167 +1,387 @@
 # 🧠 BrainJam Arena
 
-A competitive programming platform where coders train, compete, and conquer challenges through real-time duels and a military-style ranking system.
+A complete competitive programming platform with Docker support, Judge0 API integration, and military-style ranking system. Perfect for coding competitions, practice, and learning.
 
-![BrainJam Arena](https://img.shields.io/badge/Status-Active-green) ![Node.js](https://img.shields.io/badge/Node.js-v16+-blue) ![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange)
+![BrainJam Arena](https://img.shields.io/badge/Status-Active-green) ![Node.js](https://img.shields.io/badge/Node.js-18+-blue) ![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange) ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
 ## ✨ Features
 
-- 🔐 **User Authentication** - Secure registration and login with JWT tokens
-- 🎨 **Modern Dark UI** - Professional, responsive design
-- 🏆 **Military Rank System** - Progress from Private Recruit to Legendary General
-- 🔄 **Multi-Port MySQL** - Supports both standard MySQL (3306) and XAMPP (4306)
-- � **Auto Port Detection** - Automatically finds available ports (3000-3009)
-- �🛡️ **Security Features** - Password hashing, input validation, XSS protection
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🔐 **Complete Authentication System** - JWT-based secure login/registration
+- 💻 **Multi-Language Code Execution** - C++, Python, Java, JavaScript support via Judge0 API
+- 🏆 **Military Ranking System** - From Private Recruit to Legendary General
+- 🏁 **Contest Management** - Create, manage, and participate in coding contests
+- 📚 **Learning Resources** - Structured learning paths and tutorials
+- 👨‍💼 **Admin Dashboard** - Complete platform management
+- 🎯 **Problem Categories** - Algorithmic challenges with difficulty levels
+- 📊 **Progress Tracking** - Statistics, streaks, and performance analytics
+- 🌐 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🐳 **Docker Ready** - One-command deployment
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Docker - Recommended)
 
 ### Prerequisites
-- Node.js v16 or higher
-- MySQL or XAMPP
+- **Docker Desktop** (Windows/Mac) or **Docker Engine** (Linux)
+- **Git** (to clone the repository)
+
+### One-Command Setup
+```bash
+# 1. Clone the repository
+git clone https://github.com/neyamulhasan/BrainJam.git
+cd BrainJam
+
+# 2. Quick setup (Windows)
+quick-setup.bat
+
+# 2. Quick setup (Linux/macOS)
+chmod +x quick-setup.sh && ./quick-setup.sh
+```
+
+### Manual Docker Setup
+```bash
+# 1. Copy environment configuration
+cp .env.shared .env
+
+# 2. Start containers
+docker-compose up -d
+
+# 3. Initialize database
+docker-compose exec app npm run init-db
+
+# 4. Access application
+# http://localhost:3000
+```
+
+## 🛠️ Local Development Setup
+
+### Prerequisites
+- Node.js v18 or higher
+- MySQL 8.0 or XAMPP
 - Git
 
-### Installation
+### Installation Steps
 
-1. **Clone the repository**
+1. **Clone and Install**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/neyamulhasan/BrainJam.git
    cd BrainJam
-   ```
-
-2. **Install dependencies**
-   ```bash
    npm install
    ```
 
-3. **Setup Database**
-   - For XAMPP: Start Apache and MySQL services
-   - For standard MySQL: Ensure MySQL service is running
+2. **Database Setup**
+   ```bash
+   # Option A: Use existing MySQL
+   # Make sure MySQL is running on port 3306
+   
+   # Option B: Use XAMPP
+   # Start Apache and MySQL services (port 4306)
+   ```
+
+3. **Environment Configuration**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database credentials
+   ```
 
 4. **Initialize Database**
    ```bash
    npm run init-db
+   npm run init-learning
    ```
 
-5. **Start the application**
+5. **Start Application**
    ```bash
-   # Development mode (auto-restart)
+   # Development mode
    npm run dev
+   
+   # Production mode  
+   npm start
    
    # Production mode
    npm start
    ```
 
-6. **Access the application**
-   - Home: http://localhost:3000
-   - Register: http://localhost:3000/register
-   - Login: http://localhost:3000/login
-
 ## 🔧 Configuration
 
-The application automatically detects MySQL on ports 3306 and 4306. No manual configuration needed!
+### Environment Variables
 
-### Environment Variables (.env)
+**For Docker (Recommended):**
+- Uses `.env.shared` (pre-configured with Judge0 API)
+- No setup required - everything works out of the box
+
+**For Local Development:**
 ```env
 NODE_ENV=development
 PORT=3000
 
-# Database - supports multiple ports (auto-detection)
+# Database (supports auto-detection)
 DB_HOST=localhost
 DB_PORT=3306,4306
 DB_USER=root
-DB_PASSWORD=
+DB_PASSWORD=your-password
 DB_NAME=brain_jam
 
 # JWT Security
 JWT_SECRET=your-secret-key
 JWT_EXPIRE=24h
+
+# Judge0 API (Optional for local dev)
+JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
+JUDGE0_API_KEY=your-rapidapi-key
 ```
 
-## 🏗️ Project Structure
+## 🐳 Docker Configuration
 
+### Files Structure
 ```
 BrainJam/
-├── config/
-│   └── database.js          # Multi-port MySQL connection
-├── public/
-│   ├── css/                 # Stylesheets
-│   ├── js/                  # Frontend JavaScript
-│   ├── index.html           # Home page
-│   ├── login.html           # Login page
-│   └── register.html        # Registration page
-├── routes/
-│   └── auth.js              # Authentication API routes
-├── scripts/
-│   └── init-db.js           # Database initialization
-├── server.js                # Main server file
-├── schema.sql               # Database schema
-└── package.json             # Dependencies
+├── Dockerfile               # Production container
+├── docker-compose.yml       # Complete setup (app + database)
+├── .dockerignore           # Docker build exclusions
+├── .env.shared             # Shared environment (with Judge0 API)
+├── .env.example            # Template for local development
+└── quick-setup.sh/bat      # One-command setup scripts
 ```
 
-## 🎯 Military Rank System
+### Docker Services
+- **App Container**: Node.js application with health checks
+- **MySQL Container**: Database with persistent storage and auto-initialization
+- **Networking**: Internal Docker network for secure communication
+- **Volumes**: Persistent data storage for database and uploads
 
-| Rank | Rating Range | Description |
-|------|--------------|-------------|
-| 🎖️ Private Recruit | 800-999 | New coders starting their journey |
-| ⭐ Cadet Coder | 1000-1199 | Solid coding proficiency |
-| 🎯 Code Corporal | 1200-1399 | Strong problem-solving skills |
-| 🛡️ Tech Lieutenant | 1400-1599 | Strong logical thinking |
-| 👑 Algorithm Captain | 1600-1899 | Complex coding challenges |
-| 🏆 Legendary General | 1900+ | Elite coding mastery |
+### Docker Management
+```bash
+# Start services
+docker-compose up -d
 
-## 🔌 API Endpoints
+# View logs
+docker-compose logs -f app
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login  
-- `GET /api/auth/profile` - Get user profile (requires JWT)
+# Stop services
+docker-compose down
 
-### System
-- `GET /api/test-db` - Test database connection
+# Rebuild after changes
+docker-compose up -d --build
 
-## 🔒 Security Features
+# Access container shell
+docker-compose exec app sh
 
-- ✅ **Password Hashing** - bcrypt with 12 salt rounds
-- ✅ **JWT Authentication** - Secure token-based auth
-- ✅ **Input Validation** - Server and client-side validation
-- ✅ **SQL Injection Prevention** - Parameterized queries
-- ✅ **XSS Protection** - Input sanitization
-- ✅ **CORS Support** - Cross-origin resource sharing
+# Database access
+docker-compose exec mysql mysql -u brainjam_user -p brain_jam
+```
 
-## 🛠️ Development
+## 🎯 Platform Features
+
+### Core Functionality
+- 🔐 **User System**: Registration, login, profile management
+- 💻 **Code Execution**: Multi-language support via Judge0 API
+- 📊 **Problem Database**: Algorithmic challenges with test cases
+- 🏁 **Contest System**: Create and manage coding competitions
+- 📚 **Learning Hub**: Tutorials and educational resources
+- 👨‍💼 **Admin Panel**: Complete platform management
+
+### Military Ranking System
+| Rank | Rating | Badge | Requirements |
+|------|--------|-------|--------------|
+| 🎖️ Private Recruit | 800-999 | Starter | Complete registration |
+| ⭐ Cadet Coder | 1000-1199 | Learner | Solve 10+ problems |
+| 🎯 Code Corporal | 1200-1399 | Solver | Win 3+ contests |
+| 🛡️ Tech Lieutenant | 1400-1599 | Expert | 50+ problems solved |
+| 👑 Algorithm Captain | 1600-1899 | Master | Top 10% in contests |
+| 🏆 Legendary General | 1900+ | Legend | Elite performance |
+
+## 🔌 Complete API Reference
+
+### Authentication Endpoints
+```bash
+POST /api/auth/register      # User registration
+POST /api/auth/login         # User authentication  
+GET  /api/auth/profile       # Get user profile (JWT required)
+```
+
+### Problem & Contest Endpoints
+```bash
+GET  /api/problems           # List all problems
+POST /api/problems/submit    # Submit solution
+GET  /api/contests          # List contests
+POST /api/contests/create   # Create contest (admin)
+```
+
+### Admin Endpoints
+```bash
+GET  /api/admin/users       # Manage users
+POST /api/admin/problems    # Create problems
+GET  /api/admin/stats       # Platform statistics
+```
+
+### System Endpoints
+```bash
+GET  /health                # Health check
+GET  /api/test-db          # Database connection test
+```
+
+## 🔒 Security & Best Practices
+
+### Authentication Security
+- ✅ **bcrypt Hashing**: 12 salt rounds for password security
+- ✅ **JWT Tokens**: Secure session management
+- ✅ **Input Validation**: Server-side validation with express-validator
+- ✅ **SQL Injection Prevention**: Parameterized queries only
+- ✅ **XSS Protection**: Input sanitization and escaping
+
+### Docker Security
+- ✅ **Non-root User**: Application runs as non-privileged user
+- ✅ **Environment Isolation**: Separate networks and containers
+- ✅ **Secret Management**: Environment variables for sensitive data
+- ✅ **Health Monitoring**: Automatic health checks and restart policies
+
+## 🧪 Testing & Validation
+
+### Manual Testing Checklist
+- [ ] **Registration**: Create new account with validation
+- [ ] **Login**: Authenticate with JWT token generation
+- [ ] **Problem Solving**: Submit code and get execution results
+- [ ] **Contest Participation**: Join and compete in contests
+- [ ] **Admin Functions**: Manage users, problems, and contests
+- [ ] **Docker Deployment**: One-command setup works
+
+### API Testing
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# Database test
+curl http://localhost:3000/api/test-db
+
+# Registration test
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"password123","confirmPassword":"password123"}'
+
+# Login test  
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"testuser","password":"password123"}'
+```
+
+## 🛠️ Database Management
 
 ### Available Scripts
 ```bash
-npm start       # Start production server
-npm run dev     # Start development server with auto-reload
-npm run init-db # Initialize/reset database
+npm start              # Start production server
+npm run dev           # Development server with auto-reload
+npm run init-db       # Initialize/reset database
+npm run init-learning # Load learning resources
+npm run update-db     # Run database updates
 ```
 
-### Database Management
+### Database Operations
 ```bash
-# Reset database
-npm run init-db
+# Reset database (Docker)
+docker-compose exec app npm run init-db
 
-# Test connection
-curl http://localhost:3000/api/test-db
+# Update database schema (Docker)  
+docker-compose exec app npm run update-db
+
+# Access MySQL directly (Docker)
+docker-compose exec mysql mysql -u brainjam_user -p brain_jam
+
+# Backup database (Docker)
+docker-compose exec mysql mysqldump -u brainjam_user -p brain_jam > backup.sql
+
+# Restore database (Docker)
+docker-compose exec -T mysql mysql -u brainjam_user -p brain_jam < backup.sql
 ```
 
-## 🧪 Testing
+## 🚀 Deployment Options
 
-### Manual Testing
-1. **Registration Test**
-   - Go to `/register`
-   - Fill form with valid data
-   - Check successful registration and redirect
+### 1. Docker (Recommended)
+```bash
+# One-command deployment
+quick-setup.sh  # Linux/macOS
+quick-setup.bat # Windows
+```
 
-2. **Login Test**
-   - Go to `/login` 
-   - Use registered credentials
-   - Verify successful login and redirect
+### 2. Cloud Platforms
+- **Railway**: Connect GitHub repo for auto-deployment
+- **Heroku**: Use Docker container deployment
+- **DigitalOcean Apps**: Docker-based deployment
+- **AWS/GCP/Azure**: Container instances or app services
 
-3. **Database Test**
-   - Visit `/api/test-db`
+### 3. VPS/Dedicated Server
+```bash
+# Clone repository
+git clone https://github.com/neyamulhasan/BrainJam.git
+cd BrainJam
+
+# Setup with Docker
+docker-compose up -d
+
+# Or manual setup
+npm install
+npm run init-db
+npm start
+```
+
+## 🤝 Contributing & Sharing
+
+### For Contributors
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/new-feature`
+3. Make changes and test thoroughly
+4. Commit: `git commit -m "Add new feature"`
+5. Push: `git push origin feature/new-feature`
+6. Create Pull Request
+
+### For Users
+1. **Easy Setup**: Use `quick-setup.sh/bat` for instant deployment
+2. **Shared Resources**: Uses project owner's Judge0 API (no setup needed)
+3. **Complete Platform**: Get full competitive programming environment
+4. **Zero Configuration**: Everything works out of the box
+
+## 📞 Support & Documentation
+
+### Quick Help
+- **Issue Tracking**: [GitHub Issues](https://github.com/neyamulhasan/BrainJam/issues)
+- **Docker Problems**: Check `docker-compose logs -f`
+- **Database Issues**: Run `docker-compose exec app npm run init-db`
+- **Port Conflicts**: Application auto-detects available ports
+
+### Common Solutions
+```bash
+# Port already in use
+netstat -tlnp | grep :3000  # Find process using port
+sudo kill -9 <PID>          # Kill the process
+
+# Database connection failed
+docker-compose restart mysql # Restart MySQL container
+
+# Permission errors (Linux)
+sudo chown -R $USER:$USER .  # Fix file permissions
+chmod +x quick-setup.sh      # Make script executable
+```
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## 🎉 Get Started Now!
+
+```bash
+# Quick start (anyone can run this!)
+git clone https://github.com/neyamulhasan/BrainJam.git
+cd BrainJam
+quick-setup.bat  # Windows
+# or
+./quick-setup.sh # Linux/macOS
+
+# Access your platform at: http://localhost:3000
+```
+
+**Ready to compete? Start coding and climb the military ranks! 🚀**
    - Should return `{"success":true,"message":"Database connected successfully"}`
 
 ## 🔍 Troubleshooting

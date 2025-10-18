@@ -67,6 +67,14 @@ app.use('/api/problems', problemsRoutes);
 app.use('/api/contests', contestsRoutes);
 console.log('📌 Contests routes loaded');
 
+// Health check endpoint for Docker
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        service: 'BrainJam Arena'
+    });
+});
 
 // Serve HTML pages
 app.get('/', (req, res) => {
