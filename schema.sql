@@ -319,6 +319,20 @@ INSERT INTO `plagiarism_findings` (`id`, `submission_id_a`, `submission_id_b`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `chat_messages`
+--
+
+CREATE TABLE `chat_messages` (
+  `id` bigint(20) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `posts`
 --
 
@@ -929,6 +943,14 @@ ALTER TABLE `plagiarism_findings`
   ADD KEY `flagged_by` (`flagged_by`);
 
 --
+-- Indexes for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `created_at` (`created_at`);
+
+--
 -- Indexes for table `posts`
 --
 ALTER TABLE `posts`
@@ -1096,6 +1118,12 @@ ALTER TABLE `plagiarism_findings`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
@@ -1234,6 +1262,12 @@ ALTER TABLE `plagiarism_findings`
   ADD CONSTRAINT `plagiarism_findings_ibfk_1` FOREIGN KEY (`submission_id_a`) REFERENCES `submissions` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `plagiarism_findings_ibfk_2` FOREIGN KEY (`submission_id_b`) REFERENCES `submissions` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `plagiarism_findings_ibfk_3` FOREIGN KEY (`flagged_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD CONSTRAINT `chat_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `posts`

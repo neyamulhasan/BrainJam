@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion Room - BrainJam Arena</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/discussion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="message-container"></div>
+    
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon"><i class="fas fa-brain"></i></span>
+                <span class="brand-text">BrainJam</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="compete.html" class="nav-link">Compete</a>
+                <a href="practice.html" class="nav-link">Practice</a>
+                <a href="../learn.html" class="nav-link">Learn</a>
+                <a href="discussion.html" class="nav-link active">Discuss</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+                <a href="/geek-feed" class="nav-link">Geek Feed</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="search-box">
+                    <input type="text" placeholder="Search users..." id="user-search">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                </div>
+                <a href="dashboard.html" class="profile-icon-btn">
+                    <img src="images/default-avatar.svg" alt="Profile">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Discussion Area -->
+    <main class="discussion-container">
+        <div class="discussion-layout">
+            <!-- Chat Room -->
+            <section class="chat-room">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="room-info">
+                        <h2><i class="fas fa-comments"></i> General Discussion</h2>
+                        <span class="online-users" id="online-count">0 users online</span>
+                    </div>
+                    <div class="chat-controls">
+                        <button class="control-btn" id="clear-chat" title="Clear Chat">
+                            <i class="fas fa-broom"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <div class="system-message">
+                            <i class="fas fa-robot"></i>
+                            <span>Welcome to the BrainJam Discussion Room! Share your coding thoughts and connect with fellow developers.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="message-input-container">
+                    <div class="input-wrapper">
+                        <input type="text" id="message-input" placeholder="Type your message..." maxlength="500">
+                        <div class="input-actions">
+                            <button class="send-btn" id="send-btn" title="Send Message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="message-info">
+                        <span class="char-count" id="char-count">0/500</span>
+                    </div>
+                </div>
+
+
+            </section>
+
+            <!-- Online Users Sidebar -->
+            <aside class="users-sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-users"></i> Online Users</h3>
+                </div>
+                <div class="users-list" id="users-list">
+                    <div class="user-item current-user">
+                        <div class="user-avatar">
+                            <img src="/images/default-avatar.svg" alt="You" id="current-user-avatar">
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name" id="current-user-name">You</div>
+                            <div class="user-status online">Online</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typing-indicator">
+        <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <span class="typing-text">Someone is typing...</span>
+    </div>
+
+    <script src="js/discussion.js"></script>
+</body>
+</html>
