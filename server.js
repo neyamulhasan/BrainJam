@@ -56,6 +56,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
+const discussionRoutes = require('./routes/discussion');
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/geek-feed', geekFeedRoutes);
@@ -65,7 +66,9 @@ app.use('/api/learn', learnRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/problems', problemsRoutes);
 app.use('/api/contests', contestsRoutes);
+app.use('/api/discussion', discussionRoutes);
 console.log('📌 Contests routes loaded');
+console.log('💬 Discussion routes loaded');
 
 // Health check endpoint for Docker
 app.get('/health', (req, res) => {
