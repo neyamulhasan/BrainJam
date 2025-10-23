@@ -74,7 +74,6 @@ async function loadActiveContests() {
             `;
         }).join('');
     } catch (error) {
-        console.error('❌ Error loading active contests:', error);
         container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -146,7 +145,6 @@ async function loadUpcomingContests() {
             `;
         }).join('');
     } catch (error) {
-        console.error('❌ Error loading upcoming contests:', error);
         container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -191,7 +189,6 @@ async function registerForContest(contestId) {
             showNotification(data.message || 'Failed to register for contest', 'error');
         }
     } catch (error) {
-        console.error('Error registering for contest:', error);
         showNotification('Failed to register for contest. Please try again.', 'error');
     }
 }
@@ -247,7 +244,6 @@ async function viewContestDetails(contestId) {
         document.body.appendChild(modal);
         modal.style.display = 'block';
     } catch (error) {
-        console.error('Error fetching contest details:', error);
         showNotification('Failed to load contest details', 'error');
     }
 }
@@ -285,7 +281,6 @@ async function enterContest(contestId) {
         // Redirect to contest workspace
         window.location.href = `/contest.html?id=${contestId}`;
     } catch (error) {
-        console.error('Error entering contest:', error);
         showNotification('Failed to enter contest. Please try again.', 'error');
     }
 }

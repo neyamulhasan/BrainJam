@@ -42,7 +42,6 @@ async function submitCodeToJudge0(source_code, language_id, stdin, options = {})
 
         return response.data;
     } catch (error) {
-        console.error('Error submitting to Judge0:', error.response?.data || error.message);
         throw new Error('Code execution service unavailable');
     }
 }
@@ -65,7 +64,6 @@ async function getJudge0Result(token) {
 
         return response.data;
     } catch (error) {
-        console.error('Error getting result from Judge0:', error.response?.data || error.message);
         throw new Error('Could not retrieve code execution result');
     }
 }

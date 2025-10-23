@@ -73,8 +73,6 @@ Output: [1,1,2,3,4,4,5,6]
 
 async function initProblems() {
     try {
-        console.log('🔄 Initializing practice problems...');
-        
         for (const problem of sampleProblems) {
             await db.execute(
                 `INSERT INTO problems (slug, title, body_md, input_format, output_format, difficulty, is_public) 
@@ -90,11 +88,8 @@ async function initProblems() {
                 ]
             );
         }
-        
-        console.log('✅ Practice problems initialized successfully!');
         process.exit(0);
     } catch (error) {
-        console.error('❌ Error initializing problems:', error);
         process.exit(1);
     }
 }

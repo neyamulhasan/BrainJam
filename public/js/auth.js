@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 showMessage('message-container', 'Network error. Please try again.');
             } finally {
                 setLoading(loginBtn, loginBtnText, false);
@@ -217,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             } catch (error) {
-                console.error('Registration error:', error);
                 showMessage('register-message-container', 'Network error. Please try again.');
             } finally {
                 setLoading(registerBtn, registerBtnText, false);

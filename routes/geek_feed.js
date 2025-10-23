@@ -8,14 +8,11 @@ const router = express.Router();
 // Authentication middleware
 const authenticateUser = (req, res, next) => {
     try {
-        console.log('Auth headers:', req.headers.authorization);
-        
         // Get token from header
         const token = req.header('Authorization')?.replace('Bearer ', '');
         
         // Check if no token
         if (!token) {
-            console.log('No token provided in request');
             return res.status(401).json({
                 success: false,
                 message: 'No token, authorization denied'
@@ -24,7 +21,6 @@ const authenticateUser = (req, res, next) => {
         
         // Check for JWT_SECRET
         if (!process.env.JWT_SECRET) {
-            console.error('JWT_SECRET is not defined in environment variables!');
             return res.status(500).json({
                 success: false,
                 message: 'Server configuration error'
@@ -35,17 +31,14 @@ const authenticateUser = (req, res, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = decoded;
-            console.log('Authentication successful for user:', decoded.username);
             next();
         } catch (jwtError) {
-            console.error('JWT verification failed:', jwtError.message);
             return res.status(401).json({
                 success: false,
                 message: 'Token is not valid'
             });
         }
     } catch (error) {
-        console.error('Authentication error:', error);
         res.status(401).json({
             success: false,
             message: 'Token is not valid'
@@ -56,10 +49,7 @@ const authenticateUser = (req, res, next) => {
 // GET all posts with sorting options
 router.get('/posts', authenticateUser, async (req, res) => {
     try {
-        console.log('GET /posts - User:', req.user);
         const sort = req.query.sort || 'latest'; // Default to latest
-        console.log('Sorting by:', sort);
-        
         // Fix the SQL query to properly count reactions and remove profile_picture field
         let query = `
             SELECT 
@@ -82,17 +72,12 @@ router.get('/posts', authenticateUser, async (req, res) => {
         } else {
             query += ' ORDER BY p.created_at DESC';
         }
-        
-        console.log('Executing query with user ID:', req.user.id);
         const [posts] = await db.execute(query, [req.user.id]);
-        console.log('Found posts:', posts.length);
-        
         res.status(200).json({
             success: true,
             data: posts
         });
     } catch (error) {
-        console.error('Error fetching posts:', error);
         res.status(500).json({
             success: false,
             message: 'Server error'
@@ -106,13 +91,9 @@ router.post('/posts', [
     body('content').trim().isLength({ min: 1, max: 1000 }).withMessage('Post content must be between 1 and 1000 characters')
 ], async (req, res) => {
     try {
-        console.log('POST /posts - User:', req.user);
-        console.log('Post body:', req.body);
-        
         // Check for validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log('Validation errors:', errors.array());
             return res.status(400).json({
                 success: false,
                 errors: errors.array()
@@ -121,15 +102,11 @@ router.post('/posts', [
         
         const { content } = req.body;
         const userId = req.user.id;
-        console.log(`Creating post for user ID: ${userId} with content: ${content.substring(0, 30)}...`);
-        
         // Insert post into database
         const [result] = await db.execute(
             'INSERT INTO posts (user_id, content) VALUES (?, ?)',
             [userId, content]
         );
-        console.log('Post inserted with ID:', result.insertId);
-        
         // Get the newly created post with user info (without profile_picture field)
         const [post] = await db.execute(
             `SELECT 
@@ -147,15 +124,11 @@ router.post('/posts', [
             WHERE p.id = ?`,
             [result.insertId]
         );
-        
-        console.log('Fetched new post details:', post[0] ? 'Success' : 'Failed');
-        
         res.status(201).json({
             success: true,
             data: post[0]
         });
     } catch (error) {
-        console.error('Error creating post:', error);
         res.status(500).json({
             success: false,
             message: 'Server error'
@@ -242,7 +215,6 @@ router.post('/posts/:postId/react', [
             }
         });
     } catch (error) {
-        console.error('Error reacting to post:', error);
         res.status(500).json({
             success: false,
             message: 'Server error'
@@ -277,7 +249,6 @@ router.delete('/posts/:postId', authenticateUser, async (req, res) => {
             message: 'Post deleted successfully'
         });
     } catch (error) {
-        console.error('Error deleting post:', error);
         res.status(500).json({
             success: false,
             message: 'Server error'

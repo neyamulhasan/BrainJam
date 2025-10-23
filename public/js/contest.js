@@ -55,7 +55,6 @@ async function initializeContest(contestId) {
         await loadLeaderboard(contestId);
         
     } catch (error) {
-        console.error('Error initializing contest:', error);
         showNotification('Failed to load contest. Please refresh the page.', 'error');
     }
 }
@@ -126,8 +125,6 @@ async function loadContestDetails(contestId) {
         updateContestStatus();
         
     } catch (error) {
-        console.error('Error loading contest details:', error);
-        
         // Show user-friendly error message
         document.getElementById('contest-title').textContent = 'Error Loading Contest';
         document.getElementById('contest-description').textContent = error.message;
@@ -149,7 +146,6 @@ async function loadContestDetails(contestId) {
 
 async function loadContestProblems(contestId) {
     try {
-        console.log('Loading contest problems for contest ID:', contestId);
         const token = localStorage.getItem('token') || localStorage.getItem('authToken');
         const response = await fetch(`/api/contests/${contestId}/problems`, {
             headers: {
@@ -157,18 +153,12 @@ async function loadContestProblems(contestId) {
                 'Content-Type': 'application/json'
             }
         });
-        
-        console.log('Problems API response status:', response.status);
-        
         if (!response.ok) {
             throw new Error('Failed to fetch contest problems');
         }
         
         const data = await response.json();
-        console.log('Problems data received:', data);
         const problems = data.problems || [];
-        console.log('Number of problems:', problems.length);
-        
         const container = document.getElementById('problems-container');
         
         if (problems.length === 0) {
@@ -181,8 +171,6 @@ async function loadContestProblems(contestId) {
             `;
             return;
         }
-        
-        console.log('Rendering problems...');
         const problemsHtml = problems.map((problem, index) => `
             <div class="problem-card" onclick="openProblem(${problem.id}, '${escapeHtml(problem.title)}')" style="cursor: pointer; transition: all 0.3s ease;">
                 <div class="problem-header">
@@ -214,10 +202,7 @@ async function loadContestProblems(contestId) {
         `).join('');
         
         container.innerHTML = problemsHtml;
-        console.log('Problems rendered successfully');
-        
     } catch (error) {
-        console.error('Error loading contest problems:', error);
         document.getElementById('problems-container').innerHTML = `
             <div class="error-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -294,7 +279,6 @@ async function loadLeaderboard(contestId) {
         `;
         
     } catch (error) {
-        console.error('Error loading leaderboard:', error);
         document.getElementById('leaderboard-container').innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -347,7 +331,6 @@ async function openProblem(problemId) {
         document.getElementById('problem-modal').style.display = 'block';
         
     } catch (error) {
-        console.error('Error opening problem:', error);
         showNotification('Failed to load problem details', 'error');
     }
 }
@@ -391,7 +374,6 @@ async function runCode() {
         }
         
     } catch (error) {
-        console.error('Error running code:', error);
         document.getElementById('code-output').textContent = 'Failed to run code. Please try again.';
     }
 }
@@ -439,7 +421,6 @@ async function submitCode() {
         }
         
     } catch (error) {
-        console.error('Error submitting code:', error);
         showNotification('Failed to submit code. Please try again.', 'error');
     }
 }
@@ -531,14 +512,12 @@ async function openProblem(problemId, problemTitle) {
         await loadProblemDetails(problemId);
         
     } catch (error) {
-        console.error('Error opening problem:', error);
         showNotification('Failed to load problem', 'error');
     }
 }
 
 async function loadProblemDetails(problemId) {
     try {
-        console.log('Loading problem details for ID:', problemId);
         const token = localStorage.getItem('token') || localStorage.getItem('authToken');
         const response = await fetch(`/api/practice/problems/${problemId}`, {
             headers: {
@@ -546,16 +525,11 @@ async function loadProblemDetails(problemId) {
                 'Content-Type': 'application/json'
             }
         });
-        
-        console.log('Problem details response status:', response.status);
-        
         if (!response.ok) {
             throw new Error('Failed to fetch problem details');
         }
         
         const result = await response.json();
-        console.log('Problem details data:', result);
-        
         if (!result.success || !result.data) {
             throw new Error('Invalid problem data received');
         }
@@ -596,9 +570,6 @@ async function loadProblemDetails(problemId) {
         
         // Load examples separately if needed
         await loadProblemExamples(problemId);
-        
-        console.log('Problem details loaded successfully');
-        
         // Load saved code if any
         const savedCode = localStorage.getItem(`contest-${currentContest.id}-problem-${problemId}-code`);
         const savedLanguage = localStorage.getItem(`contest-${currentContest.id}-problem-${problemId}-language`);
@@ -615,7 +586,6 @@ async function loadProblemDetails(problemId) {
         }
         
     } catch (error) {
-        console.error('Error loading problem details:', error);
         document.getElementById('problem-description-content').innerHTML = `
             <div class="error-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -672,7 +642,6 @@ async function loadProblemExamples(problemId) {
             }
         }
     } catch (error) {
-        console.error('Error loading examples:', error);
         // Examples are optional, so don't show error to user
     }
 }
@@ -698,8 +667,6 @@ function setDefaultCodeTemplate() {
         javascript: `function solve() {
     // Your solution here
     const input = readline();
-    
-    console.log("Hello World");
 }
 
 solve();`,
@@ -784,7 +751,6 @@ async function runCode() {
             `;
         }
     } catch (error) {
-        console.error('Error running code:', error);
         document.getElementById('code-output').innerHTML = `
             <div class="error-output">
                 <strong>Network Error:</strong> ${error.message}
@@ -884,7 +850,6 @@ async function submitCode() {
                     showNotification(`❌ ${submission.status || 'Wrong Answer'}. Try again!`, 'error');
                 }
             } catch (contestError) {
-                console.error('Error tracking contest submission:', contestError);
                 // Continue with regular submission flow even if contest tracking fails
                 if (submission.status === 'Accepted') {
                     showNotification(`🎉 Solution Accepted! Score: ${submission.score}%`, 'success');
@@ -906,7 +871,6 @@ async function submitCode() {
         }
         
     } catch (error) {
-        console.error('Error submitting code:', error);
         document.getElementById('code-output').innerHTML = `
             <div class="error-output">
                 <strong>Network Error:</strong> ${error.message}
@@ -1019,7 +983,6 @@ async function checkContestAchievements() {
             showNotification(achievementMessage, 'success');
         }
     } catch (error) {
-        console.error('Error checking achievements:', error);
     }
 }
 

@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return await response.json();
         } catch (error) {
-            console.error(`Error in API call to ${endpoint}:`, error);
             showMessage(`Failed to load ${endpoint}: ${error.message}`, 'error');
             return null;
         }
@@ -96,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!data) {
             // Use sample data if API call fails or no data returned
-            console.log('Using sample data for resources');
             return;
         }
         
@@ -244,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeModal();
                 await loadLearningResources();
             } catch (error) {
-                console.error('Error saving resource:', error);
                 showMessage('Failed to save resource: ' + error.message, 'error');
             }
         });
@@ -275,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show modal
             document.getElementById('resource-editor-modal').style.display = 'block';
         } catch (error) {
-            console.error('Error loading resource:', error);
             showMessage('Failed to load resource: ' + error.message, 'error');
         }
     }
@@ -294,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Load data
             await loadLearningResources();
         } catch (error) {
-            console.error('Error initializing content management:', error);
             showMessage('Error loading content management data', 'error');
         }
     }

@@ -23,24 +23,14 @@ async function loadProblemDetails(problemId) {
             fetch(`/api/practice/problems/${problemId}`),
             fetch(`/api/practice/problems/${problemId}/examples`)
         ]);
-
-        console.log('Problem response status:', problemResponse.status);
-        console.log('Examples response status:', examplesResponse.status);
-
         if (!problemResponse.ok) {
             const errorText = await problemResponse.text();
-            console.error('Problem response error:', errorText);
             throw new Error(`Failed to fetch problem details: ${problemResponse.status}`);
         }
 
         const problemData = await problemResponse.json();
         const examplesData = await examplesResponse.json();
-
-        console.log('Problem data:', problemData);
-        console.log('Examples data:', examplesData);
-
         if (!problemData.success) {
-            console.error('Problem data error:', problemData.error);
             throw new Error(problemData.error || 'Failed to load problem');
         }
 
@@ -51,7 +41,6 @@ async function loadProblemDetails(problemId) {
         populateProblemDetails(problem, examples);
         
     } catch (error) {
-        console.error('Error loading problem:', error);
         showError(`Failed to load problem details: ${error.message}. Please check if the database is connected and has sample data.`);
         
         // Show a fallback message
@@ -319,7 +308,6 @@ async function testSolution(code, language) {
         }
         
     } catch (error) {
-        console.error('Error testing solution:', error);
         showError('Failed to test solution. Please try again.');
     }
 }
@@ -353,7 +341,6 @@ async function submitSolution(code, language) {
         }
         
     } catch (error) {
-        console.error('Error submitting solution:', error);
         showError('Failed to submit solution. Please try again.');
     }
 }
@@ -491,8 +478,6 @@ function displayTestResults(results) {
     
     // Scroll to results
     resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    console.log('Test results displayed:', results);
 }
 
 function showMessage(message, type = 'info') {

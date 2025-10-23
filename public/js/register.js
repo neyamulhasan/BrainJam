@@ -206,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (error) {
-            console.error('Registration error:', error);
             showMessage('Network error. Please check your connection and try again.');
         } finally {
             setLoading(false);

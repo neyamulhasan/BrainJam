@@ -11,14 +11,9 @@ async function createMySQLConnection() {
     // Parse ports from environment variable (comma-separated)
     const portsString = process.env.DB_PORT || '3306,4306';
     const ports = portsString.split(',').map(port => parseInt(port.trim()));
-    
-    console.log(`🔍 Attempting to connect to MySQL on ports: ${ports.join(', ')}`);
-    
     // Try each port until one works
     for (const port of ports) {
         try {
-            console.log(`🔌 Trying MySQL connection on port ${port}...`);
-            
             const connection = await mysql.createConnection({
                 host,
                 port,
@@ -30,12 +25,9 @@ async function createMySQLConnection() {
             
             // Test the connection
             await connection.execute('SELECT 1');
-            console.log(`✅ MySQL connection successful on port ${port}`);
-            
             return connection;
             
         } catch (error) {
-            console.log(`❌ Failed to connect on port ${port}: ${error.message}`);
             // Continue to next port
         }
     }
@@ -45,8 +37,6 @@ async function createMySQLConnection() {
 }
 
 async function initializeLearningCategories() {
-    console.log('🔄 Initializing learning categories...');
-    
     // Default categories for learning resources
     const defaultCategories = [
         { name: 'Algorithms', slug: 'algorithms', description: 'Learn about various algorithms and their implementations' },
@@ -69,7 +59,6 @@ async function initializeLearningCategories() {
         const [existingCategories] = await connection.execute('SELECT COUNT(*) as count FROM learning_categories');
         
         if (existingCategories[0].count > 0) {
-            console.log('✅ Learning categories already initialized');
             return;
         }
         
@@ -80,15 +69,11 @@ async function initializeLearningCategories() {
                 [category.name, category.slug, category.description]
             );
         }
-        
-        console.log(`✅ Successfully added ${defaultCategories.length} learning categories`);
     } catch (error) {
-        console.error('❌ Error initializing learning categories:', error);
         throw error;
     } finally {
         if (connection) {
             await connection.end();
-            console.log('📌 Database connection closed');
         }
     }
 }
@@ -100,7 +85,6 @@ if (require.main === module) {
             await initializeLearningCategories();
             process.exit(0);
         } catch (error) {
-            console.error('Failed to initialize learning categories:', error);
             process.exit(1);
         }
     })();

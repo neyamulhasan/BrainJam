@@ -13,8 +13,6 @@ const addProblemBtn = document.querySelector('.btn-add-problem');
 const problemsTableBody = document.getElementById('problemsTableBody');
 
 function initializePage() {
-    console.log('Create contest page initialized');
-    
     // Initialize form validation
     setupFormValidation();
     
@@ -120,14 +118,11 @@ async function loadProblems() {
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Problems loaded:', data);
             allProblems = data.problems || [];
         } else {
-            console.error('Failed to load problems:', response.status);
             allProblems = [];
         }
     } catch (error) {
-        console.error('Error loading problems:', error);
         allProblems = [];
     }
 }
@@ -315,9 +310,6 @@ async function handleFormSubmit(event) {
         duration_hours: parseInt(formData.get('duration')),
         problem_ids: selectedProblems.map(p => p.id)
     };
-    
-    console.log('Contest data to submit:', contestData);
-    
     // Validate required fields
     if (!contestData.name || !contestData.start_time || !contestData.duration_hours) {
         showMessage('Please fill in all required fields', 'error');
@@ -348,8 +340,6 @@ async function handleFormSubmit(event) {
         });
         
         const result = await response.json();
-        console.log('Contest creation response:', result);
-        
         if (response.ok && result.success) {
             showMessage('Contest created successfully!', 'success');
             setTimeout(() => {
@@ -359,7 +349,6 @@ async function handleFormSubmit(event) {
             throw new Error(result.error || 'Failed to create contest');
         }
     } catch (error) {
-        console.error('Error creating contest:', error);
         showMessage('Failed to create contest: ' + error.message, 'error');
     } finally {
         // Restore button state

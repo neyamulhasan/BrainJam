@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Always return a demo user for testing - we want to show the leaderboard
             // even if there's no auth data
             if (!token || !userData) {
-                console.log('No auth token or user data found, using demo user');
                 // Instead of redirecting, use a demo account
                 return { id: 1, username: 'Demo User' };
             }
@@ -17,11 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 return JSON.parse(userData);
             } catch (e) {
-                console.error('Failed to parse user data:', e);
                 return { id: 1, username: 'Demo User' };
             }
         } catch (error) {
-            console.error('Auth check error:', error);
             return { id: 1, username: 'Demo User' };
         }
     }
@@ -43,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // API call helper
     async function apiCall(endpoint, options = {}) {
         try {
-            console.log(`Making API call to ${endpoint}`);
             const token = localStorage.getItem('authToken');
             let user;
             
@@ -51,12 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const userData = localStorage.getItem('user');
                 user = userData ? JSON.parse(userData) : { id: 1 };
             } catch (e) {
-                console.error('Error parsing user data:', e);
                 user = { id: 1 };
             }
-            
-            console.log('Using user ID:', user.id);
-            
             const response = await fetch(`/api/dashboard/${endpoint}`, {
                 headers: {
                     'Authorization': `Bearer ${token || 'dummy-token'}`,
@@ -68,15 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             if (!response.ok) {
-                console.error(`API response not OK: ${response.status} ${response.statusText}`);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('API response data:', data);
             return data;
         } catch (error) {
-            console.error('API call failed:', error);
             showMessage(`Failed to load data: ${error.message}`, 'error');
             return null;
         }
@@ -84,17 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load global leaderboard
     async function loadGlobalLeaderboard(page = 1, rankFilter = 'all') {
-        console.log('Loading global leaderboard...');
         const globalLeaderboard = document.getElementById('global-leaderboard');
         globalLeaderboard.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><span>Loading global leaderboard...</span></div>';
         
         try {
-            console.log(`Calling API: leaderboard/global?page=${page}&rank=${rankFilter}`);
             const data = await apiCall(`leaderboard/global?page=${page}&rank=${rankFilter}`);
-            console.log('API response:', data);
-            
             if (!data || !data.leaderboard) {
-                console.error('No leaderboard data in response:', data);
                 globalLeaderboard.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><span>Failed to load leaderboard data. Please refresh and try again.</span></div>';
                 return;
             }
@@ -103,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePagination(data.pagination);
             updateStats(data.stats, data.currentUser);
         } catch (error) {
-            console.error('Error in loadGlobalLeaderboard:', error);
             globalLeaderboard.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><span>Error loading leaderboard: ' + error.message + '</span></div>';
         }
     }
@@ -473,7 +456,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage(result.error || 'Failed to update starred status', 'error');
             }
         } catch (error) {
-            console.error('Error updating starred status:', error);
             showMessage('Failed to update starred status', 'error');
         }
     }
@@ -496,7 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage(result.error || 'Failed to search users', 'error');
             }
         } catch (error) {
-            console.error('Error searching users:', error);
             showMessage('Failed to search users', 'error');
         }
     }
@@ -552,36 +533,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize page
     async function initializePage() {
-        console.log('Initializing leaderboard page...');
         try {
             // Always get a user (even if it's a demo user)
             const user = checkAuth();
-            console.log('Authentication check result:', user);
-            
             // Set up event listeners
             setupEventListeners();
             
             // Load data in parallel
             try {
                 await Promise.all([
-                    loadRankChart().catch(err => console.error('Error loading rank chart:', err)),
-                    loadGlobalLeaderboard().catch(err => console.error('Error loading global leaderboard:', err)),
-                    loadStarredLeaderboard().catch(err => console.error('Error loading starred leaderboard:', err))
+                    loadRankChart().catch(err => {}),
+                    loadGlobalLeaderboard().catch(err => {}),
+                    loadStarredLeaderboard().catch(err => {})
                 ]);
             } catch (loadError) {
-                console.error('Error loading data:', loadError);
                 // Individual error handling in each load function, so we don't need to do anything else here
             }
         } catch (error) {
-            console.error('Error initializing page:', error);
             showMessage('Error initializing page: ' + error.message, 'error');
         }
     }
 
     // Set up all event listeners
     function setupEventListeners() {
-        console.log('Setting up event listeners...');
-        
         // Tab switching
         document.querySelectorAll('.control-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -722,8 +696,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-
-        console.log('Event listeners set up successfully');
     }
 
     // Initialize the page

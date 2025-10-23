@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return await response.json();
         } catch (error) {
-            console.error(`Error in API call to ${endpoint}:`, error);
             showMessage(`Failed to load ${endpoint}: ${error.message}`, 'error');
             return null;
         }
@@ -154,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
             setupActionHandlers();
             
         } catch (error) {
-            console.error('Error initializing admin dashboard:', error);
             showMessage('Error loading dashboard data', 'error');
         }
     }

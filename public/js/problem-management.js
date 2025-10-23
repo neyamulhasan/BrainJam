@@ -138,11 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 allProblems = result.data;
                 displayProblems(allProblems);
             } else {
-                console.error('API error:', result.error);
                 showAlert('Error', result.error || 'Failed to load problems');
             }
         } catch (error) {
-            console.error('Error loading problems:', error);
             showAlert('Error', `Failed to load problems: ${error.message}`);
             problemsList.innerHTML = '<div class="error-message">Failed to load problems. Please try again.</div>';
         }
@@ -166,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 populateTagsFilter(availableTags);
             }
         } catch (error) {
-            console.error('Error loading tags:', error);
         }
     }
 
@@ -291,22 +288,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
-            console.log('Edit problem response status:', response.status);
             const result = await response.json();
-            console.log('Edit problem result:', result);
-            
             if (result.success) {
                 currentProblem = result.data;
                 fillProblemForm(currentProblem);
                 modalTitle.textContent = 'Edit Problem';
                 openModal(problemModal);
             } else {
-                console.error('Failed to load problem details:', result);
                 showAlert('Error', result.error || 'Failed to load problem details');
             }
         } catch (error) {
-            console.error('Error loading problem details:', error);
             showAlert('Error', 'Failed to load problem details');
         }
     }
@@ -496,8 +487,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('authToken');
             const url = problemId ? `/api/problems/${problemId}` : '/api/problems';
             const method = problemId ? 'PUT' : 'POST';
-            
-            console.log('Saving problem with data:', formData);
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -506,21 +495,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(formData)
             });
-            
-            console.log('Save problem response status:', response.status);
             const result = await response.json();
-            console.log('Save problem result:', result);
-            
             if (result.success) {
                 showAlert('Success', `Problem ${problemId ? 'updated' : 'created'} successfully`);
                 problemModal.style.display = 'none';
                 loadProblems();
             } else {
-                console.error('Failed to save problem:', result);
                 showAlert('Error', result.error || `Failed to ${problemId ? 'update' : 'create'} problem`);
             }
         } catch (error) {
-            console.error('Error saving problem:', error);
             showAlert('Error', `Failed to ${document.getElementById('problemId').value ? 'update' : 'create'} problem`);
         }
     }
@@ -548,7 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showAlert('Error', result.error || 'Failed to delete problem');
                 }
             } catch (error) {
-                console.error('Error deleting problem:', error);
                 showAlert('Error', 'Failed to delete problem');
             }
         };

@@ -13,7 +13,6 @@ router.get('/test-db', async (req, res) => {
         const [rows] = await db.execute('SELECT 1 as test');
         res.json({ success: true, message: 'Database connection works!' });
     } catch (error) {
-        console.error('Database test error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -38,12 +37,8 @@ router.get('/problems', async (req, res) => {
              GROUP BY p.id
              ORDER BY p.id ASC`
         );
-        
-        console.log('API Response sample:', rows.length > 0 ? rows[0] : 'No data');
         res.json({ success: true, data: rows });
     } catch (error) {
-        console.error('Database error:', error);
-        
         // Fallback data for testing
         const fallbackData = [
             {
@@ -87,8 +82,6 @@ router.get('/problems', async (req, res) => {
                 output_format: "Indices of the two numbers"
             }
         ];
-        
-        console.log('Using fallback data due to database error');
         res.json({ success: true, data: fallbackData });
     }
 });
@@ -97,24 +90,18 @@ router.get('/problems', async (req, res) => {
 router.get('/problems/:id', async (req, res) => {
     try {
         const problemId = req.params.id;
-        console.log(`Fetching problem with ID: ${problemId}`);
-        
         const [rows] = await db.execute(
             `SELECT id, title, slug, difficulty, body_md, input_format, output_format, constraints_md
              FROM problems 
              WHERE id = ? AND is_public = 1`,
             [problemId]
         );
-        
-        console.log(`Found ${rows.length} problems`);
-        
         if (rows.length === 0) {
             return res.status(404).json({ success: false, error: 'Problem not found' });
         }
         
         res.json({ success: true, data: rows[0] });
     } catch (error) {
-        console.error('Error fetching problem:', error);
         res.status(500).json({ success: false, error: 'Database query failed: ' + error.message });
     }
 });
@@ -133,7 +120,6 @@ router.get('/problems/:id/examples', async (req, res) => {
         
         res.json({ success: true, data: rows });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ success: false, error: 'Database query failed' });
     }
 });
@@ -149,9 +135,6 @@ router.post('/test-solution', async (req, res) => {
                 error: 'Missing required fields: problemId, code, language' 
             });
         }
-
-        console.log(`Testing solution for problem ${problemId} in ${language}`);
-        
         // Get test cases for the problem
         const testCases = await getTestCases(problemId);
         if (testCases.length === 0) {
@@ -185,7 +168,6 @@ router.post('/test-solution', async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error testing solution:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Failed to test solution: ' + error.message 
@@ -205,9 +187,6 @@ router.post('/submit-solution', async (req, res) => {
                 error: 'Missing required fields: problemId, code, language' 
             });
         }
-
-        console.log(`Submitting solution for problem ${problemId} by user ${userId}`);
-        
         // Get all test cases (including hidden ones)
         const testCases = await getTestCases(problemId, true); // includeHidden = true
         
@@ -263,7 +242,6 @@ router.post('/submit-solution', async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error submitting solution:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Failed to submit solution: ' + error.message 
@@ -295,7 +273,6 @@ async function getTestCases(problemId, includeHidden = false) {
             is_sample: row.is_sample
         }));
     } catch (error) {
-        console.error('Error fetching test cases:', error);
         // Return sample test cases for testing
         return [
             {
@@ -324,8 +301,6 @@ async function executeCodeWithTestCases(code, language, testCases) {
     
     for (let i = 0; i < testCases.length; i++) {
         const testCase = testCases[i];
-        console.log(`Running test case ${i + 1}: Input="${testCase.input}"`);
-        
         try {
             const result = await executeCode(code, language, testCase.input);
             
@@ -343,11 +318,7 @@ async function executeCodeWithTestCases(code, language, testCases) {
                 memoryUsed: result.memoryUsed || 0,
                 error: result.error || null
             });
-            
-            console.log(`Test case ${i + 1}: ${passed ? 'PASSED' : 'FAILED'}`);
-            
         } catch (error) {
-            console.error(`Test case ${i + 1} execution error:`, error);
             results.push({
                 testCaseId: testCase.id,
                 input: testCase.input,
@@ -375,8 +346,6 @@ async function executeCode(code, language, input) {
     const DISABLE_COMPILERS = false; // API key is configured and working
     
     if (DISABLE_COMPILERS) {
-        console.log(`[DEV MODE] Simulating execution for ${language} code with input: ${input}`);
-        
         // Advanced simulation mode that attempts to understand the code and provide realistic outputs
         let simulatedOutput = "";
         
@@ -401,7 +370,6 @@ async function executeCode(code, language, input) {
                 simulatedOutput = "Simulation not available for " + language;
             }
         } catch (error) {
-            console.log("Simulation error:", error.message);
             simulatedOutput = `Runtime Error: ${error.message}`;
         }
         
@@ -425,8 +393,6 @@ async function executeCode(code, language, input) {
         }
         
         const judge0LanguageId = languageResult[0].judge0_id;
-        console.log(`Using Judge0 language ID: ${judge0LanguageId} for language: ${language}`);
-        
         // Execute code using Judge0 API
         const startTime = Date.now();
         const result = await judge0.executeWithJudge0(code, judge0LanguageId, input, {
@@ -457,7 +423,6 @@ async function executeCode(code, language, input) {
                 result.token
             ]);
         } catch (dbError) {
-            console.warn('Failed to save practice run to database:', dbError);
             // Continue execution even if database save fails
         }
         
@@ -469,7 +434,6 @@ async function executeCode(code, language, input) {
         };
         
     } catch (error) {
-        console.error('Judge0 execution error:', error);
         throw error;
     }
 }
@@ -522,7 +486,6 @@ async function saveSubmission(submission) {
         
         return result.insertId;
     } catch (error) {
-        console.error('Error saving submission:', error);
         // Return a mock ID if database save fails
         return Date.now();
     }
@@ -540,7 +503,6 @@ async function awardPoints(userId, problemId, score) {
         );
         
         if (existing.length > 0) {
-            console.log('User already solved this problem, no additional points awarded');
             return;
         }
         
@@ -557,7 +519,6 @@ async function awardPoints(userId, problemId, score) {
                 }
             }
         } catch (error) {
-            console.warn('Could not fetch problem difficulty:', error.message);
         }
         
         const pointsAwarded = Math.round((basePoints * score) / 100);
@@ -567,10 +528,6 @@ async function awardPoints(userId, problemId, score) {
             'UPDATE users SET total_points = total_points + ? WHERE id = ?',
             [pointsAwarded, userId]
         );
-        
-        console.log(`Awarded ${pointsAwarded} points to user ${userId} for problem ${problemId}`);
-        
     } catch (error) {
-        console.error('Error awarding points:', error);
     }
 }

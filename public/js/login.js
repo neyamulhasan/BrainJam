@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         } catch (error) {
-            console.error('Login error:', error);
             showMessage('Network error. Please check your connection and try again.');
         } finally {
             setLoading(false);
