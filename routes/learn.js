@@ -93,7 +93,6 @@ router.get('/resources', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching learning resources:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch learning resources'
@@ -119,7 +118,6 @@ router.get('/categories', async (req, res) => {
             categories
         });
     } catch (error) {
-        console.error('Error fetching categories:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch categories'
@@ -185,7 +183,6 @@ router.get('/resources/:slug', async (req, res) => {
             resource
         });
     } catch (error) {
-        console.error('Error fetching learning resource:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch learning resource'
@@ -242,7 +239,6 @@ router.post('/resources/:id/vote', authenticateToken, async (req, res) => {
             votes: votes[0] || { upvotes: 0, downvotes: 0 }
         });
     } catch (error) {
-        console.error('Error voting on resource:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to vote on resource'

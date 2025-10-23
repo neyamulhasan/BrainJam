@@ -110,7 +110,6 @@ router.post('/register', [
         });
 
     } catch (error) {
-        console.error('Registration error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'
@@ -192,7 +191,6 @@ router.post('/login', [
         });
 
     } catch (error) {
-        console.error('Login error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'
@@ -245,7 +243,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Profile error:', error);
         res.status(500).json({
             success: false,
             error: 'Internal server error'

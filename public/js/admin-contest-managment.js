@@ -8,7 +8,6 @@ let allContests = [];
 let selectedContestId = null;
 
 function initializePage() {
-    console.log("Competition management page initialized");
     setupEventListeners();
     setupModal();
 }
@@ -66,13 +65,10 @@ async function loadContests() {
         });
         
         const data = await response.json();
-        console.log("✅ Contest data received:", data);
         allContests = data.contests || [];
-        console.log("✅ Processed contests:", allContests);
         renderContests(allContests);
         
     } catch (error) {
-        console.error("Error loading contests:", error);
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading competitions</td></tr>';
     }
 }
@@ -99,16 +95,6 @@ function buildContestRow(contest) {
     const status = getContestStatus(contest);
     const duration = contest.duration || calculateDuration(contest.start_time, contest.end_time);
     const participantCount = contest.participant_count || 0;
-    
-    console.log("Building row for contest:", {
-        id: contest.id,
-        title: contest.title,
-        duration: duration,
-        participantCount: participantCount,
-        rawDuration: contest.duration,
-        rawParticipantCount: contest.participant_count
-    });
-    
     return `
         <td>
             <strong>${escapeHtml(contest.title)}</strong><br>
@@ -230,7 +216,6 @@ async function showContestDetails(contestId) {
         }
 
     } catch (error) {
-        console.error('Error showing contest details:', error);
         alert('Failed to load contest details');
     }
 }
@@ -264,7 +249,6 @@ async function deleteContest(contestId) {
             throw new Error('Failed to delete contest');
         }
     } catch (error) {
-        console.error('Error deleting contest:', error);
         alert('Failed to delete competition');
     }
 }

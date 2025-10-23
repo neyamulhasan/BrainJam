@@ -11,9 +11,6 @@ const initGeekFeedDB = async () => {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME
         });
-
-        console.log('Connected to database. Creating geek feed tables...');
-
         // Create posts table if not exists
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS posts (
@@ -26,9 +23,6 @@ const initGeekFeedDB = async () => {
                 CONSTRAINT posts_ibfk_1 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
-
-        console.log('Posts table created or already exists.');
-
         // Create post_reactions table if not exists
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS post_reactions (
@@ -44,9 +38,6 @@ const initGeekFeedDB = async () => {
                 CONSTRAINT post_reactions_ibfk_2 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
-
-        console.log('Post reactions table created or already exists.');
-
         // Create post_stats view if not exists
         await connection.execute(`
             CREATE OR REPLACE VIEW post_stats AS
@@ -63,15 +54,10 @@ const initGeekFeedDB = async () => {
             LEFT JOIN post_reactions pr ON p.id = pr.post_id
             GROUP BY p.id;
         `);
-
-        console.log('Post stats view created or updated.');
-
         // Create sample posts if needed
         const [users] = await connection.execute('SELECT id, username FROM users LIMIT 5');
         
         if (users.length > 0) {
-            console.log('Creating sample posts...');
-            
             const samplePosts = [
                 { content: "Just achieved 'Sergeant' rank! Feeling pumped for the next challenge. #CodeCombat #AchievementUnlocked" },
                 { content: "Won a duel against ByteSlinger! It was a close one, but my algorithm prevailed. #CodeCombat #DuelWinner" },
@@ -94,15 +80,10 @@ const initGeekFeedDB = async () => {
                     [userId, post.content, createdAt]
                 );
             }
-            
-            console.log('Sample posts created.');
-            
             // Add some reactions to the posts
             const [posts] = await connection.execute('SELECT id FROM posts');
             
             if (posts.length > 0) {
-                console.log('Adding sample reactions to posts...');
-                
                 for (const post of posts) {
                     const reactingUsers = [...users].sort(() => 0.5 - Math.random()).slice(0, Math.ceil(users.length * 0.7));
                     
@@ -118,20 +99,14 @@ const initGeekFeedDB = async () => {
                         } catch (error) {
                             // Ignore duplicate key errors
                             if (!error.message.includes('Duplicate entry')) {
-                                console.error(`Error adding reaction: ${error.message}`);
                             }
                         }
                     }
                 }
-                
-                console.log('Sample reactions added.');
             }
         }
-
-        console.log('Geek Feed database setup complete!');
         await connection.end();
     } catch (error) {
-        console.error('Error initializing Geek Feed database:', error);
         process.exit(1);
     }
 };

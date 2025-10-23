@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Load posts with default sorting (latest)
             await loadPosts('latest');
         } catch (error) {
-            console.error('Error initializing:', error);
             showMessage('Error loading geek feed', 'error');
         }
     }
@@ -69,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             displayPosts(result.data);
         } catch (error) {
-            console.error('Error loading posts:', error);
             showMessage('Error loading posts', 'error');
         }
     }
@@ -168,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Force the form to reset
             document.activeElement.blur();
         } catch (error) {
-            console.error('Error creating post:', error);
             showMessage('Error creating post', 'error');
         }
     }
@@ -194,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update the UI to reflect the reaction
             updatePostReaction(postId, result.data);
         } catch (error) {
-            console.error('Error reacting to post:', error);
             showMessage('Error processing reaction', 'error');
         }
     }

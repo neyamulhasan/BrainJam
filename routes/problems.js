@@ -14,7 +14,6 @@ router.use(isAdmin);
  */
 router.get('/test', async (req, res) => {
     try {
-        console.log('Testing database connection...');
         const [result] = await db.execute('SELECT 1 as test');
         return res.json({ 
             success: true, 
@@ -22,7 +21,6 @@ router.get('/test', async (req, res) => {
             result: result 
         });
     } catch (error) {
-        console.error('Database connection test failed:', error);
         return res.status(500).json({ 
             success: false, 
             error: 'Database connection failed: ' + error.message 
@@ -40,7 +38,6 @@ router.get('/', async (req, res) => {
         try {
             const [testResult] = await db.execute('SELECT 1 as test');
         } catch (dbError) {
-            console.error('Database connection test failed:', dbError);
             return res.status(500).json({ 
                 success: false, 
                 error: 'Database connection failed: ' + dbError.message 
@@ -84,16 +81,6 @@ router.get('/', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching problems:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            code: error.code,
-            sqlMessage: error.sqlMessage,
-            sqlState: error.sqlState,
-            sql: error.sql
-        });
-        
         res.status(500).json({
             success: false,
             error: 'Failed to fetch problems: ' + error.message
@@ -120,7 +107,6 @@ router.get('/tags', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching problem tags:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch problem tags'
@@ -192,15 +178,6 @@ router.get('/:id', [
         });
 
     } catch (error) {
-        console.error('Error fetching problem details:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            code: error.code,
-            sqlMessage: error.sqlMessage,
-            sqlState: error.sqlState,
-            sql: error.sql
-        });
         res.status(500).json({
             success: false,
             error: 'Failed to fetch problem details: ' + error.message
@@ -341,15 +318,6 @@ router.post('/', [
         }
 
     } catch (error) {
-        console.error('Error creating problem:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            code: error.code,
-            sqlMessage: error.sqlMessage,
-            sqlState: error.sqlState,
-            sql: error.sql
-        });
         res.status(500).json({
             success: false,
             error: 'Failed to create problem: ' + error.message
@@ -555,15 +523,6 @@ router.put('/:id', [
         }
 
     } catch (error) {
-        console.error('Error updating problem:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            code: error.code,
-            sqlMessage: error.sqlMessage,
-            sqlState: error.sqlState,
-            sql: error.sql
-        });
         res.status(500).json({
             success: false,
             error: 'Failed to update problem: ' + error.message
@@ -648,14 +607,11 @@ router.delete('/:id', [
         }
 
     } catch (error) {
-        console.error('Error deleting problem:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to delete problem'
         });
     }
 });
-
-
 
 module.exports = router;

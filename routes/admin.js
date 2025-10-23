@@ -32,7 +32,6 @@ router.get('/stats', async (req, res) => {
             totalProblems
         });
     } catch (error) {
-        console.error('Error fetching admin stats:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch dashboard statistics'
@@ -96,7 +95,6 @@ router.get('/activity', async (req, res) => {
             activities: allActivities
         });
     } catch (error) {
-        console.error('Error fetching admin activity:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch recent activity'
@@ -134,7 +132,6 @@ router.get('/users', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching users:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch users'
@@ -172,7 +169,6 @@ router.get('/problems', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching problems:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch problems'
@@ -213,7 +209,6 @@ router.get('/competitions', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching competitions:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch competitions'

@@ -64,7 +64,6 @@ router.get('/learning-resources', async (req, res) => {
             resources
         });
     } catch (error) {
-        console.error('Error fetching learning resources:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch learning resources'
@@ -103,7 +102,6 @@ router.get('/learning-resources/:id', async (req, res) => {
             resource
         });
     } catch (error) {
-        console.error('Error fetching learning resource:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch learning resource'
@@ -186,7 +184,6 @@ router.post('/learning-resources', upload.single('featured_image'), async (req, 
             }
         });
     } catch (error) {
-        console.error('Error creating learning resource:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to create learning resource: ' + error.message,
@@ -225,8 +222,7 @@ router.put('/learning-resources/:id', upload.single('featured_image'), async (re
                 tags = req.body.tags;
             }
         }
-        
-        
+
         // Check if resource exists
         const [existingResources] = await db.execute('SELECT * FROM learning_resources WHERE id = ?', [resourceId]);
         
@@ -308,7 +304,6 @@ router.put('/learning-resources/:id', upload.single('featured_image'), async (re
                         );
                     }
                 }
-                console.log(`${tags.length} tags added to resource`);
             }
             
             res.json({
@@ -317,13 +312,10 @@ router.put('/learning-resources/:id', upload.single('featured_image'), async (re
             });
             
         } catch (dbError) {
-            console.error('Database error:', dbError);
             throw new Error(`Database error: ${dbError.message}`);
         }
         
     } catch (error) {
-        console.error('Error updating learning resource:', error);
-        
         let errorMessage = 'Failed to update learning resource';
         if (error.message) {
             errorMessage += ': ' + error.message;
@@ -360,7 +352,6 @@ router.delete('/learning-resources/:id', async (req, res) => {
             message: 'Learning resource deleted successfully'
         });
     } catch (error) {
-        console.error('Error deleting learning resource:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to delete learning resource'
@@ -378,7 +369,6 @@ router.get('/learning-categories', async (req, res) => {
             categories
         });
     } catch (error) {
-        console.error('Error fetching learning categories:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch learning categories'

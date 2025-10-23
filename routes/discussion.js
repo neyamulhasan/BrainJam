@@ -54,7 +54,6 @@ router.get('/room', authenticateToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error getting chat room:', error);
         res.status(500).json({ success: false, error: 'Failed to load chat room' });
     }
 });
@@ -102,7 +101,6 @@ router.post('/message', authenticateToken, async (req, res) => {
             data: newMessage
         });
     } catch (error) {
-        console.error('Error sending message:', error);
         res.status(500).json({ success: false, error: 'Failed to send message' });
     }
 });
@@ -138,7 +136,6 @@ router.get('/messages', authenticateToken, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error getting messages:', error);
         res.status(500).json({ success: false, error: 'Failed to load messages' });
     }
 });
@@ -154,7 +151,6 @@ router.post('/leave', authenticateToken, async (req, res) => {
             activeUsers: Array.from(activeUsers.values())
         });
     } catch (error) {
-        console.error('Error leaving chat:', error);
         res.status(500).json({ success: false, error: 'Failed to leave chat' });
     }
 });
@@ -175,7 +171,6 @@ router.get('/users', authenticateToken, async (req, res) => {
             data: Array.from(activeUsers.values())
         });
     } catch (error) {
-        console.error('Error getting users:', error);
         res.status(500).json({ success: false, error: 'Failed to get users' });
     }
 });
@@ -194,7 +189,6 @@ router.delete('/clear', authenticateToken, async (req, res) => {
             message: 'Chat cleared successfully'
         });
     } catch (error) {
-        console.error('Error clearing chat:', error);
         res.status(500).json({ success: false, error: 'Failed to clear chat' });
     }
 });

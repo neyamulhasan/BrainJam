@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return await response.json();
         } catch (error) {
-            console.error(`Error fetching ${endpoint}:`, error);
             showMessage(`Failed to load ${endpoint}`, 'error');
             return null;
         }
@@ -598,7 +597,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 editProfileModal.style.display = 'block';
             } catch (error) {
-                console.error('Error loading profile data:', error);
                 showMessage('Failed to load profile data', 'error');
             }
         });
@@ -677,7 +675,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMessage(result.error || 'Failed to update profile', 'error');
                 }
             } catch (error) {
-                console.error('Error updating profile:', error);
                 showMessage('Failed to update profile', 'error');
             }
         });
@@ -708,17 +705,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMessage(message, promoted ? 'success' : 'info');
                     
                     // Show detailed info in console for debugging
-                    console.log(`Problem solved by ${username}!`);
-                    console.log(`Rating: ${oldRating} → ${newRating} (+${ratingIncrease})`);
-                    console.log(`Rank: ${oldRank} → ${newRank}`);
-                    
                     // Refresh profile data to show updated rating and rank
                     await loadProfile();
                 } else {
                     showMessage(result.error || 'Failed to solve problem', 'error');
                 }
             } catch (error) {
-                console.error('Error solving problem:', error);
                 showMessage('Failed to solve problem', 'error');
             }
         });
@@ -802,7 +794,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage(result.error || 'Failed to search users', 'error');
             }
         } catch (error) {
-            console.error('Error searching users:', error);
             showMessage('Failed to search users', 'error');
         }
     }
@@ -888,7 +879,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage(result.error || 'Failed to update starred status', 'error');
             }
         } catch (error) {
-            console.error('Error updating starred status:', error);
             showMessage('Failed to update starred status', 'error');
         }
     }
@@ -948,7 +938,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Success message removed
         } catch (error) {
-            console.error('Dashboard initialization error:', error);
             showMessage('Failed to load dashboard data', 'error');
         }
     }
@@ -969,9 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle page visibility change
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
-            console.log('Dashboard paused (tab not visible)');
         } else {
-            console.log('Dashboard resumed (tab visible)');
         }
     });
 
@@ -980,7 +967,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Periodic data refresh (every 5 minutes)
     setInterval(() => {
-        console.log('Refreshing dashboard data...');
         loadProfile();
         loadMatches();
         loadStats();

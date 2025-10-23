@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage('Failed to load chat room', 'error');
             }
         } catch (error) {
-            console.error('Error loading chat room:', error);
             showMessage('Failed to connect to chat room', 'error');
         }
     }
@@ -175,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage(result.error || 'Failed to send message', 'error');
             }
         } catch (error) {
-            console.error('Error sending message:', error);
             showMessage('Failed to send message', 'error');
         }
     }
@@ -267,7 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateActiveUsers(result.data.activeUsers);
             }
         } catch (error) {
-            console.error('Error polling messages:', error);
             // If there's an error, reduce polling frequency
             if (messagePollingInterval) {
                 clearInterval(messagePollingInterval);
@@ -275,10 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-
-
-
-
 
     async function leaveChatRoom() {
         try {
@@ -295,7 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(messagePollingInterval);
             }
         } catch (error) {
-            console.error('Error leaving chat room:', error);
         }
     }
     
@@ -345,9 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.appendChild(systemDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
 
-    
     function updateOnlineCount() {
         const onlineCountElement = document.getElementById('online-count');
         const usersList = document.getElementById('users-list');
@@ -374,9 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
             typingIndicator.classList.remove('active');
         }
     }
-    
 
-    
     async function clearChat() {
         if (confirm('Are you sure you want to clear the chat? This action cannot be undone.')) {
             try {
@@ -407,14 +395,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMessage('Failed to clear chat: ' + result.error, 'error');
                 }
             } catch (error) {
-                console.error('Error clearing chat:', error);
                 showMessage('Failed to clear chat', 'error');
             }
         }
     }
-    
 
-    
     function formatTime(date) {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }

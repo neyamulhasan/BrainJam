@@ -14,9 +14,7 @@ router.get("/problems", authenticateToken, isAdmin, async (req, res) => {
       ORDER BY created_at DESC
     `);
     res.json({ success: true, problems });
-    console.log('✅ Fetched problems:', problems.length);
   } catch (error) {
-    console.error("Error fetching problems:", error);
     res.status(500).json({ success: false, error: "Failed to fetch problems" });
   }
 });
@@ -24,17 +22,7 @@ router.get("/problems", authenticateToken, isAdmin, async (req, res) => {
 // Create new contest
 router.post("/create-contest", authenticateToken, isAdmin, async (req, res) => {
   const { name, description, start_time, duration_hours, problem_ids } = req.body;
-  console.log('✅ Create contest request received:', {
-    name,
-    description,
-    start_time,
-    duration_hours,
-    problem_ids,
-    user: req.user
-  });
-
   if (!name || !start_time || !duration_hours || !Array.isArray(problem_ids)) {
-    console.log('❌ Missing required fields:', { name, start_time, duration_hours, problem_ids });
     return res
       .status(400)
       .json({ success: false, error: "Missing required fields" });
@@ -67,18 +55,9 @@ router.post("/create-contest", authenticateToken, isAdmin, async (req, res) => {
     }
 
     await conn.commit();
-    console.log('✅ Contest created successfully:', contestId);
     res.json({ success: true, contest_id: contestId });
   } catch (err) {
     await conn.rollback();
-    console.error("❌ Error creating contest:", err);
-    console.error("❌ Error details:", {
-      message: err.message,
-      code: err.code,
-      errno: err.errno,
-      sqlState: err.sqlState,
-      sqlMessage: err.sqlMessage
-    });
     res.status(500).json({ success: false, error: "Failed to create contest: " + err.message });
   } finally {
     conn.release();
@@ -99,12 +78,6 @@ router.get("/fetch-contests", authenticateToken, isAdmin, async (req, res) => {
     
     res.json({ contests: rows });
   } catch (err) {
-    console.error("❌ Error fetching contests:", err);
-    console.error("❌ SQL Error details:", {
-      message: err.message,
-      code: err.code,
-      sqlMessage: err.sqlMessage
-    });
     res.status(500).json({ error: "Failed to fetch contests" });
   }
 });
@@ -136,7 +109,6 @@ router.get("/active", authenticateToken, async (req, res) => {
 
     res.json({ success: true, contests });
   } catch (error) {
-    console.error("❌ Error fetching active contests:", error);
     res.status(500).json({ success: false, error: "Failed to fetch active contests" });
   }
 });// Get upcoming contests for users
@@ -166,7 +138,6 @@ router.get("/upcoming", authenticateToken, async (req, res) => {
 
     res.json({ success: true, contests });
   } catch (error) {
-    console.error("❌ Error fetching upcoming contests:", error);
     res.status(500).json({ success: false, error: "Failed to fetch upcoming contests" });
   }
 });
@@ -201,7 +172,6 @@ router.get("/:id/details", authenticateToken, async (req, res) => {
       contest: contest
     });
   } catch (err) {
-    console.error("Error fetching contest details:", err);
     res.status(500).json({ 
       success: false, 
       error: "Failed to fetch contest details" 
@@ -249,7 +219,6 @@ router.get("/:id/info", authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error("❌ Error fetching contest info:", error);
     res.status(500).json({ 
       success: false, 
       error: "Failed to fetch contest info" 
@@ -282,7 +251,6 @@ router.get("/:id", authenticateToken, isAdmin, async (req, res) => {
       problems: problemRows,
     });
   } catch (err) {
-    console.error("Error fetching contest details:", err);
     res.status(500).json({ error: "Failed to fetch contest details" });
   }
 });
@@ -304,7 +272,6 @@ router.delete("/:id", authenticateToken, isAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     await conn.rollback();
-    console.error("Error deleting contest:", err);
     res.status(500).json({ error: "Failed to delete contest" });
   } finally {
     conn.release();
@@ -357,7 +324,6 @@ router.post("/:id/register", authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error("❌ Error registering for contest:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to register for contest" 
@@ -410,7 +376,6 @@ router.get("/:id/status", authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error("❌ Error checking contest status:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to check contest status" 
@@ -445,17 +410,9 @@ router.get("/:id/problems", authenticateToken, async (req, res) => {
       WHERE cp.contest_id = ?
       ORDER BY cp.display_order ASC
     `, [contestId]);
-    
-    console.log('✅ Fetched contest problems for user:', {
-      userId,
-      contestId,
-      problemCount: problems.length
-    });
-    
     res.json({ success: true, problems });
     
   } catch (error) {
-    console.error("❌ Error fetching contest problems:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to fetch contest problems" 
@@ -482,16 +439,9 @@ router.get("/:id/leaderboard", authenticateToken, async (req, res) => {
       ORDER BY score DESC, last_submission ASC
       LIMIT 50
     `, [contestId]);
-    
-    console.log('✅ Fetched contest leaderboard:', {
-      contestId,
-      participantCount: leaderboard.length
-    });
-    
     res.json({ success: true, leaderboard });
     
   } catch (error) {
-    console.error("❌ Error fetching contest leaderboard:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to fetch contest leaderboard" 
@@ -568,16 +518,6 @@ router.post("/:id/submit/:problemId", authenticateToken, async (req, res) => {
         `, [contestId, userId]);
       }
     }
-    
-    console.log('✅ Contest submission recorded:', {
-      contestId,
-      userId,
-      problemId,
-      status,
-      score,
-      allProblemsCompleted
-    });
-    
     res.json({ 
       success: true, 
       message: "Submission recorded",
@@ -585,7 +525,6 @@ router.post("/:id/submit/:problemId", authenticateToken, async (req, res) => {
     });
     
   } catch (error) {
-    console.error("❌ Error recording contest submission:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to record submission" 
@@ -613,7 +552,6 @@ router.get("/:id/achievements", authenticateToken, async (req, res) => {
     res.json({ success: true, achievements });
     
   } catch (error) {
-    console.error("❌ Error fetching contest achievements:", error);
     res.status(500).json({ 
       success: false, 
       message: "Failed to fetch achievements" 

@@ -11,14 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await fetch('/api/practice/problems');
             const data = await res.json();
             if (data.success) {
-                console.log('Fetched problems:', data.data);
-                console.log('Sample problem structure:', data.data[0]);
                 return data.data;
             }
-            console.error('Failed to fetch problems:', data.error);
             return [];
         } catch (err) {
-            console.error('Error fetching problems:', err);
             return [];
         }
     }
@@ -44,14 +40,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Render table and attach click event for navigation
     async function renderTable(problems) {
-        console.log('Rendering table with problems:', problems);
         tableBody.innerHTML = '';
 
         problems.forEach(problem => {
-            console.log('Processing problem:', problem);
-            console.log('Problem topics:', problem.topics);
-            console.log('Problem difficulty:', problem.difficulty);
-            
             const row = document.createElement('tr');
             row.classList.add('challenge-row');
             
@@ -59,9 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const topics = problem.topics ? problem.topics.split(', ').map(topic => 
                 `<span class="topic-badge">${topic}</span>`
             ).join('') : '<span class="no-topics">No topics</span>';
-            
-            console.log('Formatted topics:', topics);
-            
             row.innerHTML = `
                 <td style="font-weight: 600; color: var(--primary-color);">#${problem.id}</td>
                 <td>${problem.title}</td>

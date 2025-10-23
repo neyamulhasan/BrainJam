@@ -46,7 +46,6 @@ async function createMySQLConnection() {
             });
             
         } catch (error) {
-            console.log(`❌ Failed to connect on port ${port}: ${error.message}`);
             // Continue to next port
         }
     }
@@ -68,9 +67,6 @@ async function initializePool() {
         connection.release();
         
     } catch (error) {
-        console.error('❌ MySQL pool initialization failed:', error.message);
-        console.log('💡 Make sure MySQL is running on port 3306 or 4306 (XAMPP)');
-        console.log('💡 Check your database credentials in the .env file');
     }
 }
 
@@ -96,13 +92,8 @@ async function initializePoolWithRetry() {
                 
             } catch (error) {
                 retries--;
-                console.log(`⏳ Database connection attempt failed (${10 - retries}/10). Retrying in 3 seconds...`);
-                console.log(`   Error: ${error.message}`);
                 
                 if (retries === 0) {
-                    console.error('❌ MySQL pool initialization failed after all retries:', error.message);
-                    console.log('💡 Make sure MySQL is running on port 3306 or 4306 (XAMPP)');
-                    console.log('💡 Check your database credentials in the .env file');
                     throw error;
                 }
                 
@@ -120,7 +111,6 @@ initializePoolWithRetry();
 // Export a function that returns the pool when ready
 async function getPool() {
     if (!pool) {
-        console.log('⏳ Waiting for database pool initialization...');
         await initializePoolWithRetry();
     }
     return pool;

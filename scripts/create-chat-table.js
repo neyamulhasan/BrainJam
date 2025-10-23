@@ -2,8 +2,6 @@ const db = require('../config/database');
 
 async function createChatTable() {
     try {
-        console.log('Creating chat_messages table...');
-        
         const createTableQuery = `
             CREATE TABLE IF NOT EXISTS chat_messages (
                 id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -19,11 +17,8 @@ async function createChatTable() {
         `;
         
         await db.execute(createTableQuery);
-        console.log('✅ Chat messages table created successfully!');
-        
         process.exit(0);
     } catch (error) {
-        console.error('❌ Error creating chat table:', error);
         process.exit(1);
     }
 }

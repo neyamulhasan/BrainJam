@@ -26,7 +26,6 @@ const authenticateToken = async (req, res, next) => {
             next();
         });
     } catch (error) {
-        console.error('Authentication error:', error);
         res.status(500).json({
             success: false,
             error: 'Authentication failed'
@@ -61,7 +60,6 @@ const isAdmin = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.error('Admin check error:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to verify admin permissions'

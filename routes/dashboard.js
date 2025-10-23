@@ -33,13 +33,11 @@ async function updateUserRank(userId) {
                 'UPDATE users SET rank_label = ? WHERE id = ?',
                 [newRank, userId]
             );
-            console.log(`Updated user ${userId} rank from ${currentRank} to ${newRank} (rating: ${currentRating})`);
             return { changed: true, oldRank: currentRank, newRank, rating: currentRating };
         }
         
         return { changed: false, rank: currentRank, rating: currentRating };
     } catch (error) {
-        console.error('Error updating user rank:', error);
         return false;
     }
 }
@@ -128,7 +126,6 @@ router.get('/profile', requireAuth, async (req, res) => {
             streakDays: user.streak_days || 0
         });
     } catch (error) {
-        console.error('Profile fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -178,7 +175,6 @@ router.get('/matches', requireAuth, async (req, res) => {
         
         res.json(formattedMatches);
     } catch (error) {
-        console.error('Matches fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -269,7 +265,6 @@ router.get('/stats', requireAuth, async (req, res) => {
             top3Finishes: contestPerformance[0]?.top3_finishes || 0
         });
     } catch (error) {
-        console.error('Stats fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -289,7 +284,6 @@ router.get('/achievements', requireAuth, async (req, res) => {
         
         res.json(badges);
     } catch (error) {
-        console.error('Achievements fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -354,7 +348,6 @@ router.get('/activity', requireAuth, async (req, res) => {
             badges: recentBadges
         });
     } catch (error) {
-        console.error('Activity fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -460,7 +453,6 @@ router.get('/leaderboard', requireAuth, async (req, res) => {
             }))
         });
     } catch (error) {
-        console.error('Leaderboard fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -468,12 +460,9 @@ router.get('/leaderboard', requireAuth, async (req, res) => {
 // Get global leaderboard with pagination and filtering (for leaderboard page)
 router.get('/leaderboard/global', requireAuth, async (req, res) => {
     try {
-        console.log('Leaderboard API called with user ID:', req.user.id);
-        console.log('Query params:', req.query);
-        
         const userId = req.user.id;
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 50;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 50));
         const rankFilter = req.query.rank || 'all';
         const offset = (page - 1) * limit;
         
@@ -485,8 +474,15 @@ router.get('/leaderboard/global', requireAuth, async (req, res) => {
             queryParams.push(rankFilter);
         }
         
+        // Ensure limit and offset are proper integers
+        const limitParam = Number(limit);
+        const offsetParam = Number(offset);
+        
+        if (!Number.isInteger(limitParam) || !Number.isInteger(offsetParam) || limitParam < 1 || offsetParam < 0) {
+            return res.status(400).json({ error: 'Invalid pagination parameters' });
+        }
+        
         // Get total count for pagination
-        console.log('Executing count query...');
         const [countResult] = await db.execute(`
             SELECT COUNT(*) as total 
             FROM users u 
@@ -494,7 +490,7 @@ router.get('/leaderboard/global', requireAuth, async (req, res) => {
         `, queryParams);
         
         const totalUsers = countResult[0].total;
-        const totalPages = Math.ceil(totalUsers / limit);
+        const totalPages = Math.ceil(totalUsers / limitParam);
         
         // Get leaderboard data with consistent ranking
         const [leaderboard] = await db.execute(`
@@ -509,8 +505,8 @@ router.get('/leaderboard/global', requireAuth, async (req, res) => {
             FROM users u
             ${rankCondition}
             ORDER BY u.rating DESC, u.created_at ASC
-            LIMIT ? OFFSET ?
-        `, [...queryParams, limit, offset]);
+            LIMIT ${limitParam} OFFSET ${offsetParam}
+        `, queryParams);
         
         // Get current user info with consistent ranking calculation
         const [currentUser] = await db.execute(`
@@ -567,14 +563,10 @@ router.get('/leaderboard/global', requireAuth, async (req, res) => {
                 starredUsers: starredCount[0].total_starred
             }
         });
-        console.log('Leaderboard API response sent successfully');
     } catch (error) {
-        console.error('Global leaderboard fetch error:', error);
-        console.error('Error stack:', error.stack);
         res.status(500).json({ 
             error: 'Internal server error', 
-            message: error.message,
-            stack: process.env.NODE_ENV === 'production' ? null : error.stack
+            message: error.message
         });
     }
 });
@@ -691,7 +683,6 @@ router.get('/rank-history', requireAuth, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Rank history fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -747,7 +738,6 @@ router.get('/leaderboard/starred', requireAuth, async (req, res) => {
             currentUserIncluded: starredLeaderboard.some(user => user.id === userId)
         });
     } catch (error) {
-        console.error('Starred users leaderboard fetch error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -806,7 +796,6 @@ router.post('/starred/:action/:targetUserId', requireAuth, async (req, res) => {
         }
 
     } catch (error) {
-        console.error('Starred user action error:', error);
         res.status(500).json({ error: 'Failed to update starred user status' });
     }
 });
@@ -857,7 +846,6 @@ router.get('/users/search', requireAuth, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('User search error:', error);
         res.status(500).json({ error: 'Failed to search users' });
     }
 });
@@ -919,7 +907,6 @@ router.put('/profile', requireAuth, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Profile update error:', error);
         res.status(500).json({ error: 'Failed to update profile' });
     }
 });
@@ -944,7 +931,6 @@ router.get('/profile/email', requireAuth, async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Profile email fetch error:', error);
         res.status(500).json({ error: 'Failed to fetch profile data' });
     }
 });
@@ -1003,7 +989,6 @@ router.post('/simulate-solve', requireAuth, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error simulating problem solve:', error);
         res.status(500).json({ error: 'Failed to simulate problem solve' });
     }
 });

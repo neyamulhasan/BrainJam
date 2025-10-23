@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return await response.json();
         } catch (error) {
-            console.error(`Error in API call to ${endpoint}:`, error);
             showMessage(`Failed: ${error.message}`, 'error');
             return null;
         }
@@ -132,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading categories:', error);
             showMessage('Failed to load categories', 'error');
         }
     }
@@ -278,25 +276,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Debug log of form data
-                    console.log('Sending request to:', url);
-                    console.log('Method:', method);
-                    console.log('FormData contents:');
                     for (const [key, value] of formData.entries()) {
                         if (key === 'content') {
-                            console.log(`${key}: [Content length: ${value.length}]`);
                         } else if (key === 'featured_image' && value instanceof File) {
-                            console.log(`${key}: File: ${value.name} (${value.size} bytes)`);
                         } else {
-                            console.log(`${key}: ${value}`);
                         }
                     }
                     for (const [key, value] of formData.entries()) {
                         if (key === 'content') {
-                            console.log(`${key}: [Content length: ${value.length}]`);
                         } else if (key === 'featured_image' && value instanceof File) {
-                            console.log(`${key}: File: ${value.name} (${value.size} bytes)`);
                         } else {
-                            console.log(`${key}: ${value}`);
                         }
                     }
                     
@@ -310,29 +299,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     // Log the raw response for debugging
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', Object.fromEntries([...response.headers.entries()]));
-                    
                     const responseText = await response.text();
-                    console.log('Raw response text:', responseText);
-                    
                     let result;
                     try {
                         result = JSON.parse(responseText);
                     } catch (parseError) {
-                        console.error('Error parsing JSON response:', parseError);
                         throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
                     }
                     
                     if (!response.ok) {
-                        console.error('API error response:', result);
                         const errorMsg = result.error || `Error ${response.status}: ${response.statusText}`;
                         const errorDetails = result.details ? `\n\nDetails: ${result.details}` : '';
                         throw new Error(errorMsg + errorDetails);
                     }
-                    
-                    console.log('API success response:', result);
-                    
                     if (result.success) {
                         // Show success message
                         const message = isEditMode ? 'Resource updated successfully!' : 'Resource created successfully!';
@@ -346,8 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(result.error || 'Unknown error occurred');
                     }
                 } catch (error) {
-                    console.error('Error processing resource:', error);
-                    
                     // Create a more detailed error message
                     let errorMessage = isEditMode ? 'Error updating resource: ' : 'Error creating resource: ';
                     
@@ -358,12 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Add more debug info - using let variables defined earlier in the scope
-                    console.error('Request details:', {
-                        isEditMode,
-                        resourceId,
-                        contentLength: content ? content.length : 0
-                    });
-                    
                     // Show error message
                     showErrorMessage(errorMessage);
                 }
@@ -376,8 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isEditMode || !resourceId) return;
         
         try {
-            console.log('Loading resource data for ID:', resourceId);
-            
             const response = await fetch(`/api/learning/learning-resources/${resourceId}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -390,15 +359,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
-            console.log('Resource data received:', data);
-            
             if (!data.success || !data.resource) {
                 throw new Error('Failed to load resource data');
             }
             
             const resource = data.resource;
-            console.log('Resource object:', resource);
-            
             // Set form fields
             document.getElementById('resource-title').value = resource.title || '';
             
@@ -415,20 +380,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const tagsElement = document.getElementById('resource-tags');
                 if (tagsElement) {
                     tagsElement.value = resource.tags.join(', ');
-                    console.log('Tags set:', resource.tags.join(', '));
                 }
             }
             
             // Set content in Quill editor
             if (window.quill) {
-                console.log('Setting Quill content:', resource.content ? resource.content.substring(0, 100) + '...' : 'No content');
                 if (resource.content) {
                     window.quill.root.innerHTML = resource.content;
                 } else {
                     window.quill.root.innerHTML = '';
                 }
             } else {
-                console.error('Quill editor not found');
             }
             
             // Set meta description if available
@@ -446,7 +408,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showMessage('Resource loaded for editing', 'info');
             
         } catch (error) {
-            console.error('Error loading resource:', error);
             showErrorMessage(`Failed to load resource: ${error.message}`);
         }
     }
@@ -509,7 +470,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 throw new Error(result.error || 'Unknown error occurred');
                             }
                         } catch (error) {
-                            console.error('Error deleting resource:', error);
                             showErrorMessage(`Failed to delete resource: ${error.message}`);
                         }
                     }
@@ -545,7 +505,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
         } catch (error) {
-            console.error('Error updating user info:', error);
         }
     }
     

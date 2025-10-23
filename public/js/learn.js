@@ -154,7 +154,6 @@ async function checkAuthStatus() {
             }
         }
     } catch (error) {
-        console.error('Error checking auth status:', error);
     }
 }
 
@@ -170,7 +169,6 @@ async function loadCategories() {
             updateStats();
         }
     } catch (error) {
-        console.error('Error loading categories:', error);
         showError('Failed to load categories');
     }
 }
@@ -261,7 +259,6 @@ async function loadResources() {
             showError(data.error);
         }
     } catch (error) {
-        console.error('Error loading resources:', error);
         showError('Failed to load resources');
         showEmptyState(targetGrid, 'Failed to load resources');
     }
@@ -362,7 +359,6 @@ async function openResourceModal(slug) {
             `;
         }
     } catch (error) {
-        console.error('Error loading resource:', error);
         resourceDetail.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-exclamation-triangle"></i>
